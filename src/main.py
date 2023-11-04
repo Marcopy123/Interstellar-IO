@@ -12,7 +12,6 @@ UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each fram
 WINDOW_WIDTH = 700
 WINDOW_HEIGHT = 700
 NUM_OF_PARTICLES = 25
-
 MIN_ZOOM = 0.1
 MAX_ZOOM = 10.0
 
@@ -48,7 +47,9 @@ def main():
                 
             if event.type == pg.MOUSEWHEEL:
                 sensitivity = 0.1
+                print("Camera Zoom:" + str(camera.zoom))
                 if camera.zoom + event.y * sensitivity > MIN_ZOOM and camera.zoom + event.y * sensitivity < MAX_ZOOM: 
+                    
                     camera.zoom += event.y * sensitivity
         
         for i in range(UPDATES_PER_FRAME):
