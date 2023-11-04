@@ -35,7 +35,7 @@ class Body:
     # If n is 0, no merges were done (no bodies)
     # Otherwise, the size of n is the number of merges that were made, i.e. the number of bodies deleted
     # Additionally, if n is negative, the self object has been merged AND deleted
-    def update(self, dt: float, bodies: [], start: int):
+    def update(self, dt: float, bodies: [], start: int, check_despawn: bool, spawn_radius: float):
         if self.id % (1 / self.trail_density) == 0:
             if len(self.trail) < self.max_trail:
                 self.trail.append(self.pos.copy())
@@ -54,7 +54,6 @@ class Body:
             result = self.gravitational_force_from_other(other)
             if check_despawn and len(result) > 1:
                 if result[1] > DESPAWN_RADIUS + spawn_radius:
-                    print("despawn")
                     merges.append([current, -2])
                     bodies.pop(current)
                     body_count -= 1
