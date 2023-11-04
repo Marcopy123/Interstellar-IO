@@ -81,8 +81,14 @@ def main():
                     direction = direction / np.linalg.norm(direction)
                 else:
                     direction = np.array([0.0, 0.0])
-                force = 5 * camera.obj.mass** 2 * DT
-                camera.obj.add_force(direction, force)
+                ejectedMass = camera.obj.mass / 250
+                relMassVelocity = 4 * math.sqrt(camera.obj.mass)
+                camera.obj.mass -= ejectedMass
+                dforce = camera.obj.mass * ejectedMass * relMassVelocity
+                dforce /= (DT * (1 - ejectedMass))
+
+                #force = camera.obj.mass**2 * DT
+                camera.obj.add_force(direction, dforce)
             
             
         
