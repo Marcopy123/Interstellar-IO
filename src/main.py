@@ -88,7 +88,6 @@ def main():
 
                 camera.obj.add_force(direction, dforce)
             
-            
         
         for i in range(UPDATES_PER_FRAME):
             for j in bodies:
