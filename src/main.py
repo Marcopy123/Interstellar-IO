@@ -47,7 +47,6 @@ def main():
                 
             if event.type == pg.MOUSEWHEEL:
                 sensitivity = 0.1
-                print("Camera Zoom:" + str(camera.zoom))
                 if camera.zoom + event.y * sensitivity > MIN_ZOOM and camera.zoom + event.y * sensitivity < MAX_ZOOM: 
                     
                     camera.zoom += event.y * sensitivity
