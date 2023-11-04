@@ -1,8 +1,8 @@
 import numpy as np
 import math
 
-BIG_G = 3 # Gravitational constant
-DENSITY = 0.25 # Units of mass per unit of area
+BIG_G = 1 # Gravitational constant
+DENSITY = 0.5 # Units of mass per unit of area
 
 class Body:
 
@@ -35,13 +35,16 @@ class Body:
             force = self.gravitational_force_from_other(j)
             if force.size == 1:
                 # Merge
-                biggest = max(self, j, key=lambda x: x.radius)
-                smallest = j if biggest == self else self
+                big = max(self, j, key=lambda x: x.radius)
+                small = j if big == self else self
 
-                # TODO update velocity (collision)
-                biggest.mass += smallest.mass
-                biggest.radius = math.sqrt(biggest.mass / DENSITY)
-                bodies.remove(smallest)
+                # Conservation of momentum
+                big.vel = ((big.mass * big.vel) + (small.mass * small.vel)) / (big.mass + small.mass)
+
+                big.mass += small.mass
+                big.radius = math.sqrt(big.mass / DENSITY)
+
+                bodies.remove(small)
 
                 continue
             
