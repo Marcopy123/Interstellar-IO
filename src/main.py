@@ -27,6 +27,14 @@ def gravitational_force(first, second):
     return scalar_force * unit_vec
 
 
+def draw(bodies, screen : pg.Surface):
+    # Draws the body as a square
+    size = 50
+    for i in bodies:
+        body_rect = pg.Surface((size, size))
+        screen.blit(i, (i.pos[0] - size/2, i.pos[1] - size/2))
+
+
 def main():
     print("interstellarIO")
 
@@ -47,38 +55,26 @@ def main():
             net_force = np.array([0, 0])
 
             for j in bodies:
-                # TODO do probably need to check if i == j otherwise there will be a division by zero
+                if i == j:
+                    continue
+
                 # TODO optimize (like reuse the result of (i, j) for (j, i))
                 force = gravitational_force(i, j)
 
                 # TODO vectorize this scalar and add to net_force
                 # TODO maybe reuse calculated second.pos - first.pos with gravitational_force
 
+                net_force += gravitational_force(i, j)
+
+                # TODO maybe reuse calculated second.pos - first.pos with gravitational_force
+
+            acceleration = net_force / i.mass
+            i.vel += acceleration
+            i.pos += i.vel
+
         pg.display.flip()
     
     pg.quit()
-        
-def draw(bodies, screen : pg.Surface):
-    # Draws the body as a square
-    size = 50
-    for i in bodies:
-        body_rect = pg.Surface((size, size))
-        screen.blit(i, (i.pos[0] - size/2, i.pos[1] - size/2))
-        
-        net_force = np.array([0.0, 0.0])
-
-        for j in bodies:
-            if i == j:
-                continue
-
-            # TODO optimize (like reuse the result of (i, j) for (j, i))
-            net_force += gravitational_force(i, j)
-
-            # TODO maybe reuse calculated second.pos - first.pos with gravitational_force
-
-        acceleration = net_force / i.mass
-        i.vel += acceleration
-        i.pos += i.vel
 
 if __name__ == "__main__":
     main()
