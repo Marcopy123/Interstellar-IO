@@ -61,6 +61,7 @@ def main():
     targetZoom = camera.calculate_zoom_based_on_mass()
     spawner = Spawner(bodies[0])
     
+    
     running = True
     # pygame main loop
     while running:
@@ -71,7 +72,7 @@ def main():
                 
             if event.type == pg.MOUSEWHEEL:
                 sensitivity = 0.1
-                if camera.zoom + event.y * sensitivity > MIN_ZOOM and camera.zoom + event.y * sensitivity < MAX_ZOOM: 
+                if camera.zoom + event.y * sensitivity > MIN_ZOOM and camera.zoom + event.y * sensitivity < MAX_ZOOM + max(0, camera.obj.radius - 25): 
                     camera.zoom += event.y * sensitivity
                     
             if pg.key.get_pressed()[pg.K_SPACE]:
