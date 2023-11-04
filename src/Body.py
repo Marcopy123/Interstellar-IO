@@ -1,6 +1,8 @@
 import numpy as np
+import math
+
 BIG_G = 1 # Gravitational constant
-DENSITY = 15 # Units of mass per unit of area
+DENSITY = 10 # Units of mass per unit of area
 
 class Body:
     def __init__(self, mass: float, pos: np.ndarray[np.float64], vel: np.ndarray[np.float64]) -> None:
