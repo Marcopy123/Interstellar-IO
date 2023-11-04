@@ -50,6 +50,18 @@ def main():
                 if camera.zoom + event.y * sensitivity > MIN_ZOOM and camera.zoom + event.y * sensitivity < MAX_ZOOM: 
                     
                     camera.zoom += event.y * sensitivity
+                    
+            if pg.key.get_pressed()[pg.K_SPACE]:
+                direction = np.array([pg.mouse.get_pos()[0], pg.mouse.get_pos()[1]]) - np.array([WINDOW_WIDTH/2, WINDOW_HEIGHT/2])
+                if np.linalg.norm(direction) != 0:
+                    direction = direction / np.linalg.norm(direction)
+                else:
+                    direction = np.array([0.0, 0.0])
+                print(direction)
+                force = 5 * camera.obj.mass** 2 * DT
+                camera.obj.add_force(direction, force)
+            
+            
         
         for i in range(UPDATES_PER_FRAME):
             for j in bodies:

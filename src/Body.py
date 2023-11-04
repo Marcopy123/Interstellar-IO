@@ -12,7 +12,7 @@ class Body:
         self.uid = uid
         self.radius = math.sqrt(mass / DENSITY)
         self.net_force = np.array([0.0, 0.0])
-
+        
     # Returns vector for gravitational pull of other Body acting on this Body
     def gravitational_force_from_other(self, other):
         d_pos = other.pos - self.pos
@@ -66,3 +66,6 @@ class Body:
 
         self.net_force = np.array([0.0, 0.0])
         return merges
+    
+    def add_force(self, direction : np.ndarray, force):
+        self.net_force = direction * force / self.mass
