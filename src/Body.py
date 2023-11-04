@@ -2,7 +2,7 @@ import numpy as np
 import math
 
 BIG_G = 1 # Gravitational constant
-DENSITY = 0.5 # Units of mass per unit of area
+DENSITY = 10 # Units of mass per unit of area
 
 class Body:
 
