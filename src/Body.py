@@ -6,10 +6,11 @@ DENSITY = 25 # Units of mass per unit of area
 
 class Body:
 
-    def __init__(self, mass, pos, vel):
+    def __init__(self, mass, pos, vel, uid):
         self.mass = mass
         self.pos = pos
         self.vel = vel
+        self.uid = uid
         self.radius = math.sqrt(mass / DENSITY)
         self.net_force = np.array([0.0, 0.0])
 
@@ -29,7 +30,7 @@ class Body:
     # Otherwise, the size of n is the number of merges that were made, i.e. the number of bodies deleted
     # Additionally, if n is negative, the self object has been merged AND deleted
     def update(self, dt: float, bodies: [], start: int):
-        merge_count = [0]
+        merges = []
         current = start
         body_count = len(bodies)
         while current < body_count:
@@ -47,11 +48,12 @@ class Body:
                 big.mass += small.mass
                 big.radius = math.sqrt(big.mass / DENSITY)
                 bodies.remove(small)
-                
-                merge_count[0] += 1
+
+                merges.append([small.uid, big.uid])
+
                 if small == self:
-                    merge_count.append(bodies.index(big))
-                    return merge_count
+                    return merges
+                
                 body_count -= 1
                 continue
             
@@ -64,4 +66,4 @@ class Body:
         self.pos += self.vel * dt
 
         self.net_force = np.array([0.0, 0.0])
-        return merge_count
+        return merges

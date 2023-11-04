@@ -31,7 +31,7 @@ def main():
         xVel = random.random() * 2.0
         yVel = random.random() * 2.0
         mass = random.randint(100, 1000)
-        bodies.append(Body(mass, np.array([xPos, yPos]), np.array([xVel, yVel])))
+        bodies.append(Body(mass, np.array([xPos, yPos]), np.array([xVel, yVel]), i))
 
     clock = pg.time.Clock()
     camera = Camera(bodies[0], screen)
@@ -54,16 +54,20 @@ def main():
                  current = 0
             body_count = len(bodies)
             while current < body_count:
-                merge_count = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1)
-                if len(merge_count) > 1:
-                    # Self was deleted
-                    if current == 0:
-                        camera.obj = bodies[merge_count[1]]
-                    # Self was deleted
-                    current -= 1
+                merges = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1)
+                for m in merges:
 
-                body_count -= merge_count[0]
+                    if m[0] == -1:
+                        # Self was deleted
+                        current -= 1
+                    if m[0] == camera.obj.uid:
+                        # Camera needs change
+                        for b in bodies:
+                            if b.uid == m[1]:
+                                camera.obj = b
+                                break
 
+                body_count -= len(merges)
                 current += 1
 
         camera.update()
