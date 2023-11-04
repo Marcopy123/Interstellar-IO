@@ -41,8 +41,8 @@ def main():
     bodies = []
     for i in range(NUM_OF_PARTICLES):
         xPos = random.randint(0, WINDOW_WIDTH)
-        yPos = random.random(0, WINDOW_HEIGHT)
-        bodies.append(Body(i, [xPos, yPos], [0, 0])) # Random stuff
+        yPos = random.randint(0, WINDOW_HEIGHT)
+        bodies.append(Body(i, np.array([xPos, yPos]), [0, 0])) # Random stuff
 
     running = True
     # pygame main loop
