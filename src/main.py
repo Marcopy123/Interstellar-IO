@@ -4,6 +4,7 @@ import pygame as pg
 from Body import Body
 import random
 from Camera import Camera
+from Spawner import Spawner
 
 DT = 1 # Delta time for the physics engine
 UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each frame
@@ -42,7 +43,8 @@ def main():
     # bodies.append(earth2)
     clock = pg.time.Clock()
     camera = Camera(bodies[0], screen)
-
+    spawner = Spawner(bodies[0])
+    
     running = True
     # pygame main loop
     while running:
@@ -71,7 +73,11 @@ def main():
                 body_count -= merge_count
 
                 current += 1
-
+        n_particles = len(bodies)
+        for i in range(NUM_OF_PARTICLES - n_particles):
+            spawner.spawn()
+        
+        
         camera.update()
         camera.draw(bodies)
         pg.display.flip()
