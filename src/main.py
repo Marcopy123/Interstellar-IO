@@ -6,17 +6,9 @@ import random
 
 DT = 1 # Delta time
 
-pg.init()
 WINDOW_WIDTH = 1200
 WINDOW_HEIGHT = 800
 NUM_OF_PARTICLES = 100
-
-window_size = (WINDOW_WIDTH, WINDOW_HEIGHT)
-screen = pg.display.set_mode(window_size)
-
-pg.display.set_caption("Interstellar IO")
-
-screen = pg.display.set_mode(window_size)
 
 
 def draw(bodies, screen : pg.Surface):
@@ -30,11 +22,19 @@ def draw(bodies, screen : pg.Surface):
 def main():
     print("interstellarIO")
 
+    pg.init()
+    window_size = (WINDOW_WIDTH, WINDOW_HEIGHT)
+    screen = pg.display.set_mode(window_size)
+
+    pg.display.set_caption("Interstellar IO")
+
+    screen = pg.display.set_mode(window_size)
+
     bodies = []
     for i in range(NUM_OF_PARTICLES):
         xPos = random.randint(0, WINDOW_WIDTH)
-        yPos = random.random(0, WINDOW_HEIGHT)
-        bodies.append(Body(i, [xPos, yPos], [0, 0])) # Random stuff
+        yPos = random.randint(0, WINDOW_HEIGHT)
+        bodies.append(Body(float(i), np.array([float(xPos), float(yPos)]), np.array([0.0, 0.0])))
 
     running = True
     # pygame main loop
@@ -52,4 +52,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
