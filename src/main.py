@@ -41,7 +41,7 @@ def main():
     # bodies.append(earth)
     # bodies.append(earth2)
     clock = pg.time.Clock()
-    camera = Camera(bodies[1], screen)
+    camera = Camera(bodies[0], screen)
 
     running = True
     # pygame main loop
