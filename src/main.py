@@ -1,4 +1,4 @@
-import math
+import math 
 import numpy as np
 import pygame as pg
 from Body import Body
@@ -8,8 +8,8 @@ from Camera import Camera
 DT = 1 # Delta time for the physics engine
 UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each frame
 
-WINDOW_WIDTH = 800
-WINDOW_HEIGHT = 600
+WINDOW_WIDTH = 700
+WINDOW_HEIGHT = 700
 NUM_OF_PARTICLES = 15
 
 def main():

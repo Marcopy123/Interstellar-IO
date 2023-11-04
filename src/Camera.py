@@ -1,10 +1,10 @@
 import numpy as np
 import pygame as pg
-
+import math
 
 WINDOW_WIDTH = 700
 WINDOW_HEIGHT = 700
-NUM_OF_PARTICLES = 20
+NUM_OF_PARTICLES = 250
 MAP_WIDTH = 3000
 MAP_HEIGHT = 3000
 
