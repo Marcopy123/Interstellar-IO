@@ -5,7 +5,7 @@ BIG_G = 1 # Gravitational constant
 DENSITY = 5 # Units of mass per unit of area
 
 class Body:
-    def __init__(self, mass: float, pos: np.ndarray[np.float64], vel: np.ndarray[np.float64]) -> None:
+    def __init__(self, mass: float, pos: np.ndarray[np.float64], vel: np.ndarray[np.float64], uid: int) -> None:
         self.mass = mass
         self.pos = pos
         self.vel = vel

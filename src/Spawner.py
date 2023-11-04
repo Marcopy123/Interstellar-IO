@@ -11,9 +11,9 @@ class Spawner:
         return
     
     def newRadius(self, player: Body):
-        return player.radius * 100
+        return player.radius * 100 + 100
 
-    def spawnParticle(self, player: Body) -> Body:
+    def spawnParticle(self, player: Body, uid: int) -> Body:
         # spawn a particle within the size, random mass, random x y pos within radius, initial velocity of 0
         # make sure the particle is smaller than the player body mass
         massOfParticle = random.randint(10, int(player.mass / 2))
@@ -30,4 +30,4 @@ class Spawner:
         # Update size
         self.size = self.newRadius(player)
 
-        return Body.Body(massOfParticle, np.array([float(randX), randY]), np.array([0.0, 0.0]))
+        return Body.Body(massOfParticle, np.array([float(randX), randY]), np.array([0.0, 0.0]), uid)

@@ -27,23 +27,12 @@ def main():
 
     screen = pg.display.set_mode(window_size)
 
-
     bodies = []
-    # for i in range(NUM_OF_PARTICLES):
-    #     xPos = float(random.randint(0, WINDOW_WIDTH))
-    #     yPos = float(random.randint(0, WINDOW_HEIGHT))
-    #     xVel = random.random() * 2.0
-    #     yVel = random.random() * 2.0
-    #     mass = random.randint(100, 1000)
-    #     bodies.append(Body(mass, np.array([xPos, yPos]), np.array([xVel, yVel])))
 
-    sun = Body(2000, np.array([WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2]), np.array([0.0, 0.0]))
-    earth = Body(500, np.array([WINDOW_WIDTH / 3, WINDOW_HEIGHT / 2]), np.array([0.0, 8.5]))
-    earth2 = Body(1000, np.array([WINDOW_WIDTH / 4, WINDOW_HEIGHT / 2]), np.array([0.0, 4.0]))
+    first_player = Body(2000, np.array([WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2]), np.array([0.0, 0.0]), 0)
+    next_player_uid = 1
 
-    bodies.append(sun)
-    bodies.append(earth)
-    bodies.append(earth2)
+    bodies.append(first_player)
     
     clock = pg.time.Clock()
     camera = Camera(bodies[0], screen)
@@ -86,8 +75,9 @@ def main():
 
         n_particles = len(bodies)
         for i in range(NUM_OF_PARTICLES - n_particles):
-            bodies.append(spawner.spawnParticle(sun))
-        # pg.draw.circle(screen, (255, 0, 0), (sun.pos[0] - camera.offset[0], sun.pos[1] - camera.offset[1]), spawner.size * camera.zoom)
+            bodies.append(spawner.spawnParticle(camera.obj, next_player_uid))
+            next_player_uid += 1
+
         camera.update()
         camera.draw(bodies)
         pg.display.flip()
