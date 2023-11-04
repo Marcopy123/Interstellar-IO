@@ -31,4 +31,3 @@ class Spawner:
         self.size = self.newRadius(player)
 
         return Body.Body(massOfParticle, np.array([float(randX), randY]), np.array([0.0, 0.0]))
-

@@ -6,7 +6,7 @@ import random
 from Camera import Camera
 from Spawner import Spawner
 
-DT = 1 # Delta time for the physics engine
+DT = 0.5 # Delta time for the physics engine
 UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each frame
 
 WINDOW_WIDTH = 700
@@ -44,6 +44,7 @@ def main():
     bodies.append(sun)
     bodies.append(earth)
     bodies.append(earth2)
+    
     clock = pg.time.Clock()
     camera = Camera(bodies[0], screen)
     spawner = Spawner(bodies[0])
@@ -60,21 +61,26 @@ def main():
                 sensitivity = 0.1
                 if camera.zoom + event.y * sensitivity > MIN_ZOOM and camera.zoom + event.y * sensitivity < MAX_ZOOM: 
                     camera.zoom += event.y * sensitivity
-                print(camera.zoom)
         
         for i in range(UPDATES_PER_FRAME):
             for j in bodies:
                  current = 0
             body_count = len(bodies)
             while current < body_count:
-                merge_count = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1)
-                if merge_count < 0:
-                    # Self was deleted
-                    current -= 1
-                    merge_count *= -1
+                merges = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1)
+                for m in merges:
 
-                body_count -= merge_count
+                    if m[0] == -1:
+                        # Self was deleted
+                        current -= 1
+                    if m[0] == camera.obj.uid:
+                        # Camera needs change
+                        for b in bodies:
+                            if b.uid == m[1]:
+                                camera.obj = b
+                                break
 
+                body_count -= len(merges)
                 current += 1
 
 
