@@ -7,7 +7,6 @@ BIG_G = 1 # Gravitational constant
 class Body:
     def __init__(self, mass, pos, vel):
         self.mass = mass
-        self.mass = mass
         self.pos = pos
         self.vel = vel
         return
