@@ -1,6 +1,13 @@
 import numpy as np
 import pygame as pg
 
+
+WINDOW_WIDTH = 700
+WINDOW_HEIGHT = 700
+NUM_OF_PARTICLES = 20
+MAP_WIDTH = 3000
+MAP_HEIGHT = 3000
+
 class Camera:
     def __init__(self, follow_obj, screen) -> None:
         self.obj = follow_obj
