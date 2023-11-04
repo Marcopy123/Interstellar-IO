@@ -6,11 +6,11 @@ import random
 from Camera import Camera
 
 DT = 1 # Delta time for the physics engine
-UPDATES_PER_FRAME = 2 # Number of iterations of the physics engine for each frame
+UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each frame
 
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
-NUM_OF_PARTICLES = 20
+NUM_OF_PARTICLES = 15
 
 def main():
     print("interstellarIO")
@@ -25,23 +25,15 @@ def main():
 
 
     bodies = []
-    # for i in range(NUM_OF_PARTICLES):
-    #     xPos = float(random.randint(0, WINDOW_WIDTH))
-    #     yPos = float(random.randint(0, WINDOW_HEIGHT))
-    #     xVel = float(random.randint(0, 3))
-    #     yVel = float(random.randint(0, 3))
-    #     mass = random.randint(100, 1000)
-    #     bodies.append(Body(mass, np.array([xPos, yPos]), np.array([xVel, yVel])))
-    sun = Body(2000, np.array([WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2]), np.array([0.0, 0.0]))
-    earth = Body(500, np.array([WINDOW_WIDTH / 3, WINDOW_HEIGHT / 2]), np.array([0.0, 8.5]))
-    earth2 = Body(1000, np.array([WINDOW_WIDTH / 4, WINDOW_HEIGHT / 2]), np.array([0.0, 4.0]))
-
-    bodies.append(sun)
-    bodies.append(earth)
-    bodies.append(earth2)
+    for i in range(NUM_OF_PARTICLES):
+        xPos = float(random.randint(0, WINDOW_WIDTH))
+        yPos = float(random.randint(0, WINDOW_HEIGHT))
+        xVel = random.random() * 2.0
+        yVel = random.random() * 2.0
+        mass = random.randint(100, 1000)
+        bodies.append(Body(mass, np.array([xPos, yPos]), np.array([xVel, yVel])))
 
     clock = pg.time.Clock()
-
     camera = Camera(earth2, screen)
 
     running = True
@@ -60,7 +52,18 @@ def main():
         
         for i in range(UPDATES_PER_FRAME):
             for j in bodies:
-                j.update(DT / UPDATES_PER_FRAME, bodies)
+                 current = 0
+            body_count = len(bodies)
+            while current < body_count:
+                merge_count = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1)
+                if merge_count < 0:
+                    # Self was deleted
+                    current -= 1
+                    merge_count *= -1
+
+                body_count -= merge_count
+
+                current += 1
 
         camera.update()
         camera.draw(bodies)
