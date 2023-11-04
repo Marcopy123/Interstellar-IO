@@ -1,12 +1,14 @@
 import numpy as np
 BIG_G = 1 # Gravitational constant
+DENSITY = 15 # Units of mass per unit of area
 
 class Body:
     def __init__(self, mass: float, pos: np.ndarray[np.float64], vel: np.ndarray[np.float64]) -> None:
         self.mass = mass
         self.pos = pos
         self.vel = vel
-        return
+        self.radius = math.sqrt(mass / DENSITY)
+        self.net_force = np.array([0.0, 0.0])
 
     # Returns vector for gravitational pull of other Body acting on this Body
     def gravitational_force_from_other(self, other):
@@ -16,19 +18,44 @@ class Body:
         unit_vec = d_pos / np.linalg.norm(d_pos)
         return scalar_force * unit_vec
 
-    def net_gravitational_force(self, bodies):
-        net_force = 0.0
-        for j in bodies:
-            if self == j:
-                continue
-
-            # TODO optimize (like reuse the result of (i, j) for (j, i))
+    # Calculates net force on body and updates kinematic quantities
+    # Returns an integer n:
+    # If n is 0, no merges were done (no bodies)
+    # Otherwise, the size of n is the number of merges that were made, i.e. the number of bodies deleted
+    # Additionally, if n is negative, the self object has been merged AND deleted
+    def update(self, dt: float, bodies: [], start: int):
+        merge_count = 0
+        current = start
+        body_count = len(bodies)
+        while current < body_count:
             # TODO maybe reuse calculated second.pos - first.pos with gravitational_force
-            net_force += self.gravitational_force_from_other(j)
+            other = bodies[current]
+            force = self.gravitational_force_from_other(other)
+            if force.size == 1:
+                # Merge
+                big = max(self, other, key=lambda x: x.radius)
+                small = self if big == other else other
 
-        return net_force
-
-    def update(self, dt, bodies):
-        acceleration = self.net_gravitational_force(bodies) / self.mass
+                # Conservation of momentum
+                # TODO instead of changing vel, change net_force?? maybe
+                big.vel = ((big.mass * big.vel) + (small.mass * small.vel)) / (big.mass + small.mass)
+                big.mass += small.mass
+                big.radius = math.sqrt(big.mass / DENSITY)
+                bodies.remove(small)
+                
+                merge_count += 1
+                if small == self:
+                    return (1 * merge_count)
+                body_count -= 1
+                continue
+            
+            self.net_force += force
+            # The force from i to j is the opposite of that of j to i, which is why we have a start variable
+            other.net_force -= force
+            current += 1
+        acceleration = self.net_force / self.mass
         self.vel += acceleration * dt
         self.pos += self.vel * dt
+
+        self.net_force = np.array([0.0, 0.0])
+        return merge_count

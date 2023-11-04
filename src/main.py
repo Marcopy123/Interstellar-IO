@@ -3,21 +3,14 @@ import numpy as np
 import pygame as pg
 from Body import Body
 import random
-import Camera as Camera
+from Camera import Camera
 
 DT = 1 # Delta time for the physics engine
-UPDATES_PER_FRAME = 2 # Number of iterations of the physics engine for each frame
+UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each frame
 
-WINDOW_WIDTH = 700
-WINDOW_HEIGHT = 700
-NUM_OF_PARTICLES = 20
-MAP_WIDTH = 3000
-MAP_HEIGHT = 3000
-
-map_surface = pg.Surface((MAP_WIDTH, MAP_HEIGHT))
-Camera = Camera(WINDOW_WIDTH, WINDOW_HEIGHT)
-
-
+WINDOW_WIDTH = 800
+WINDOW_HEIGHT = 600
+NUM_OF_PARTICLES = 15
 
 def main():
     print("interstellarIO")
@@ -35,12 +28,13 @@ def main():
     for i in range(NUM_OF_PARTICLES):
         xPos = float(random.randint(0, WINDOW_WIDTH))
         yPos = float(random.randint(0, WINDOW_HEIGHT))
-        xVel = float(random.randint(0, 3))
-        yVel = float(random.randint(0, 3))
+        xVel = random.random() * 2.0
+        yVel = random.random() * 2.0
         mass = random.randint(100, 1000)
         bodies.append(Body(mass, np.array([xPos, yPos]), np.array([xVel, yVel])))
 
     clock = pg.time.Clock()
+    camera = Camera(bodies[0], screen)
 
     running = True
     # pygame main loop
@@ -49,11 +43,30 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running = False
+                
+            if event.type == pg.MOUSEWHEEL:
+                sensitivity = 0.1
+                if camera.zoom + event.y * sensitivity > 0.5 and camera.zoom + event.y * sensitivity < 10: 
+                    camera.zoom += event.y * sensitivity
+                print(camera.zoom)
         
         for i in range(UPDATES_PER_FRAME):
             for j in bodies:
-                j.update(DT / UPDATES_PER_FRAME, bodies)
+                 current = 0
+            body_count = len(bodies)
+            while current < body_count:
+                merge_count = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1)
+                if merge_count < 0:
+                    # Self was deleted
+                    current -= 1
+                    merge_count *= -1
 
+                body_count -= merge_count
+
+                current += 1
+
+        camera.update()
+        camera.draw(bodies)
         pg.display.flip()
         clock.tick(60)
     
