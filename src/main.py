@@ -6,14 +6,14 @@ import random
 from Camera import Camera
 from Spawner import Spawner
 
-DT = 0.5 # Delta time for the physics engine
+DT = 0.2 # Delta time for the physics engine
 UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each frame
 
 WINDOW_WIDTH = 700
 WINDOW_HEIGHT = 700
 NUM_OF_PARTICLES = 50
 MIN_ZOOM = 0.1
-MAX_ZOOM = 10
+MAX_ZOOM = 20
 
 def draw_grid(surface, grid_color, cell_size, offset):
     """
