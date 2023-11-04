@@ -11,7 +11,7 @@ UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each fram
 
 WINDOW_WIDTH = 700
 WINDOW_HEIGHT = 700
-NUM_OF_PARTICLES = 25
+NUM_OF_PARTICLES = 50
 MIN_ZOOM = 0.1
 MAX_ZOOM = 10
 
@@ -81,7 +81,6 @@ def main():
                     direction = direction / np.linalg.norm(direction)
                 else:
                     direction = np.array([0.0, 0.0])
-                print(direction)
                 force = 5 * camera.obj.mass** 2 * DT
                 camera.obj.add_force(direction, force)
             
@@ -104,9 +103,7 @@ def main():
                         for b in bodies:
                             if b.uid == m[1]:
                                 camera.obj = b
-                                ntargetZoom = camera.calculate_zoom_based_on_mass()
-                                if ntargetZoom != targetZoom:
-                                    print("a")
+                                targetZoom = camera.calculate_zoom_based_on_mass()
                                 break
 
                 body_count -= len(merges)
