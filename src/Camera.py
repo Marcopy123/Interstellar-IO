@@ -41,10 +41,18 @@ class Camera:
         """
     def draw(self, objs):
         for i in objs:
-            if True:
-                #pg.draw.circle(self.screen, (0, 0, 0), (draw_pos[0] - self.offset[0], draw_pos[1] - self.offset[1]), i.radius)
-                x_pos = (i.pos[0] - self.offset[0] - self.screen.get_size()[0] / 2) * self.zoom + self.screen.get_size()[0] / 2
-                y_pos = (i.pos[1] - self.offset[1] - self.screen.get_size()[1] / 2) * self.zoom + self.screen.get_size()[1] / 2
-                pg.draw.circle(self.screen, (0, 0, 0), (x_pos, y_pos), i.radius * self.zoom)
+            # Draw trail
+            for j in i.trail:
+                x_pos = (j[0] - self.offset[0] - self.screen.get_size()[0] / 2) * self.zoom + self.screen.get_size()[0] / 2
+                y_pos = (j[1] - self.offset[1] - self.screen.get_size()[1] / 2) * self.zoom + self.screen.get_size()[1] / 2
+                pg.draw.circle(self.screen, (0, 0, 0), (x_pos, y_pos), i.radius/3 * self.zoom)
+                
             
+            # Draw object
+            x_pos = (i.pos[0] - self.offset[0] - self.screen.get_size()[0] / 2) * self.zoom + self.screen.get_size()[0] / 2
+            y_pos = (i.pos[1] - self.offset[1] - self.screen.get_size()[1] / 2) * self.zoom + self.screen.get_size()[1] / 2
+            pg.draw.circle(self.screen, (0, 0, 0), (x_pos, y_pos), i.radius * self.zoom)
+            
+
+                
         

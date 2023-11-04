@@ -13,6 +13,11 @@ class Body:
         self.radius = math.sqrt(mass / DENSITY)
         self.net_force = np.array([0.0, 0.0])
         
+        self.trail = []
+        self.max_trail = 30
+        self.trail_density = 0.25
+        self.id = 0
+        
     # Returns vector for gravitational pull of other Body acting on this Body
     def gravitational_force_from_other(self, other):
         d_pos = other.pos - self.pos
@@ -29,6 +34,15 @@ class Body:
     # Otherwise, the size of n is the number of merges that were made, i.e. the number of bodies deleted
     # Additionally, if n is negative, the self object has been merged AND deleted
     def update(self, dt: float, bodies: [], start: int):
+        if self.id % (1 / self.trail_density) == 0:
+            if len(self.trail) < self.max_trail:
+                self.trail.append(self.pos.copy())
+            else:
+                self.trail = self.trail[1:]
+                self.trail.append(self.pos.copy())
+                
+        self.id += 1
+        
         merges = []
         current = start
         body_count = len(bodies)
