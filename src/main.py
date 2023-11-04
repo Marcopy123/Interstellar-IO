@@ -6,14 +6,14 @@ import random
 from Camera import Camera
 from Spawner import Spawner
 
-DT = 0.5 # Delta time for the physics engine
+DT = 0.2 # Delta time for the physics engine
 UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each frame
 
 WINDOW_WIDTH = 700
 WINDOW_HEIGHT = 700
-NUM_OF_PARTICLES = 25
+NUM_OF_PARTICLES = 50
 MIN_ZOOM = 0.1
-MAX_ZOOM = 10
+MAX_ZOOM = 20
 
 def draw_grid(surface, grid_color, cell_size, offset):
     """
@@ -45,7 +45,6 @@ def main():
 
     pg.init()
     
-
     pg.display.set_caption("Interstellar IO")
 
     screen = pg.display.set_mode(window_size)
@@ -81,9 +80,13 @@ def main():
                     direction = direction / np.linalg.norm(direction)
                 else:
                     direction = np.array([0.0, 0.0])
-                print(direction)
-                force = 5 * camera.obj.mass** 2 * DT
-                camera.obj.add_force(direction, force)
+                ejectedMass = camera.obj.mass / 250
+                relMassVelocity = 4 * math.sqrt(camera.obj.mass)
+                camera.obj.mass -= ejectedMass
+                dforce = camera.obj.mass * ejectedMass * relMassVelocity
+                dforce /= (DT * (1 - ejectedMass))
+
+                camera.obj.add_force(direction, dforce)
             
             
         
@@ -92,8 +95,12 @@ def main():
                  current = 0
             body_count = len(bodies)
             while current < body_count:
-                merges = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1)
+                merges = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1, (bodies[current].uid == camera.obj.uid), spawner.newRadius(camera.obj))
                 for m in merges:
+                    if m[1] == -2:
+                        # Was despawned
+                        if m[0] == current:
+                            current -= 1
 
                     if m[0] == -1:
                         # Self was deleted
@@ -104,9 +111,7 @@ def main():
                         for b in bodies:
                             if b.uid == m[1]:
                                 camera.obj = b
-                                ntargetZoom = camera.calculate_zoom_based_on_mass()
-                                if ntargetZoom != targetZoom:
-                                    print("a")
+                                targetZoom = camera.calculate_zoom_based_on_mass()
                                 break
 
                 body_count -= len(merges)

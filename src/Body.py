@@ -3,6 +3,7 @@ import math
 
 BIG_G = 1 # Gravitational constant
 DENSITY = 25 # Units of mass per unit of area
+DESPAWN_RADIUS = 350
 
 class Body:
     def __init__(self, mass: float, pos: np.ndarray[np.float64], vel: np.ndarray[np.float64], uid: int) -> None:
@@ -25,8 +26,9 @@ class Body:
         if distance_squared < (self.radius + other.radius)**2 / 2:
             return np.array([0.0])
         scalar_force = BIG_G * self.mass * other.mass / distance_squared
-        unit_vec = d_pos / np.linalg.norm(d_pos)
-        return scalar_force * unit_vec
+        d_pos_magnitude = np.linalg.norm(d_pos)
+        unit_vec = d_pos / d_pos_magnitude
+        return [scalar_force * unit_vec, d_pos_magnitude]
 
     # Calculates net force on body and updates kinematic quantities
     # Returns an integer n:
@@ -49,7 +51,15 @@ class Body:
         while current < body_count:
             # TODO maybe reuse calculated second.pos - first.pos with gravitational_force
             other = bodies[current]
-            force = self.gravitational_force_from_other(other)
+            result = self.gravitational_force_from_other(other)
+            if check_despawn and len(result) > 1:
+                if result[1] > DESPAWN_RADIUS + spawn_radius:
+                    print("despawn")
+                    merges.append([current, -2])
+                    bodies.pop(current)
+                    body_count -= 1
+                    continue
+            force = result[0]
             if force.size == 1:
                 # Merge
                 big = max(self, other, key=lambda x: x.radius)
