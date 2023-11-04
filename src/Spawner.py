@@ -11,7 +11,7 @@ class Spawner:
         return
     
     def newRadius(self, player: Body):
-        return player.radius * 100 + 100
+        return player.radius * 50 + 100
 
     def spawnParticle(self, player: Body, uid: int) -> Body:
         # spawn a particle within the size, random mass, random x y pos within radius, initial velocity of 0
