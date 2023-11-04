@@ -2,15 +2,21 @@ import math
 import numpy as np
 import pygame as pg
 from Body import Body
+import random
 
 BIG_G = 1 # Gravitational constant
 
-class Body:
-    def __init__(self, mass, pos, vel):
-        self.mass = mass
-        self.pos = pos
-        self.vel = vel
-        return
+pg.init()
+WINDOW_WIDTH = 1200
+WINDOW_HEIGHT = 800
+NUM_OF_PARTICLES = 100
+
+window_size = (WINDOW_WIDTH, WINDOW_HEIGHT)
+screen = pg.display.set_mode(window_size)
+
+pg.display.set_caption("Interstellar IO")
+
+screen = pg.display.set_mode(window_size)
 
 # Returns vector for gravitational pull of second Body acting on first Body
 def gravitational_force(first, second):
@@ -25,8 +31,10 @@ def main():
     print("interstellarIO")
 
     bodies = []
-    for i in range(5):
-        bodies.append(Body(i+1, np.array([float(i), float(i)]), np.array([float(i), float(i)]))) # Random stuff
+    for i in range(NUM_OF_PARTICLES):
+        xPos = random.randint(0, WINDOW_WIDTH)
+        yPos = random.random(0, WINDOW_HEIGHT)
+        bodies.append(Body(i, [xPos, yPos], [0, 0])) # Random stuff
 
     running = True
     # pygame main loop
