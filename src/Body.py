@@ -2,11 +2,10 @@ import numpy as np
 import math
 
 BIG_G = 1 # Gravitational constant
-DENSITY = 25 # Units of mass per unit of area
+DENSITY = 5 # Units of mass per unit of area
 
 class Body:
-
-    def __init__(self, mass, pos, vel, uid):
+    def __init__(self, mass: float, pos: np.ndarray[np.float64], vel: np.ndarray[np.float64]) -> None:
         self.mass = mass
         self.pos = pos
         self.vel = vel
@@ -14,7 +13,7 @@ class Body:
         self.radius = math.sqrt(mass / DENSITY)
         self.net_force = np.array([0.0, 0.0])
 
-    # Returns vector for gravitational pull of other Body acting on this Body. Returns an empty array with a single -1.0 if the bodies collide
+    # Returns vector for gravitational pull of other Body acting on this Body
     def gravitational_force_from_other(self, other):
         d_pos = other.pos - self.pos
         distance_squared = sum(x**2 for x in d_pos)
