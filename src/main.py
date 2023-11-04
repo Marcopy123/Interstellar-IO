@@ -4,7 +4,8 @@ import pygame as pg
 from Body import Body
 import random
 
-DT = 1 # Delta time
+DT = 1 # Delta time for the physics engine
+UPDATES_PER_FRAME = 2 # Number of iterations of the physics engine for each frame
 
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
@@ -32,17 +33,12 @@ def main():
 
 
     bodies = []
-    #for i in range(NUM_OF_PARTICLES):
-        #xPos = float(random.randint(0, WINDOW_WIDTH))
-        #yPos = float(random.randint(0, WINDOW_HEIGHT))
-        #xVel = float(random.randint(0, 3))
-        #yVel = float(random.randint(0, 3))
-        #bodies.append(Body(float(i + 1), np.array([xPos, yPos]), np.array([xVel, yVel])))
-
-    sun = Body(2000, np.array([WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2]), np.array([0.0, 0.0]))
-    earth = Body(50, np.array([WINDOW_WIDTH / 3, WINDOW_HEIGHT / 2]), np.array([0.0, 4.0]))
-    bodies.append(sun)
-    bodies.append(earth)
+    for i in range(NUM_OF_PARTICLES):
+        xPos = float(random.randint(0, WINDOW_WIDTH))
+        yPos = float(random.randint(0, WINDOW_HEIGHT))
+        xVel = float(random.randint(0, 3))
+        yVel = float(random.randint(0, 3))
+        bodies.append(Body(float(i + 1), np.array([xPos, yPos]), np.array([xVel, yVel])))
 
     clock = pg.time.Clock()
 
@@ -53,9 +49,11 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running = False
-            
-        for i in bodies:
-            i.update(DT, bodies)
+        
+        for i in range(UPDATES_PER_FRAME):
+            for j in bodies:
+                j.update(DT / UPDATES_PER_FRAME, bodies)
+                
         draw(bodies, screen)
         pg.display.flip()
         clock.tick(60)

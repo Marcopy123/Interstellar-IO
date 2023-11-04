@@ -10,12 +10,12 @@ class Body:
         self.mass = mass
         self.pos = pos
         self.vel = vel
-        self.radius = math.sqrt(mass / DENSITY)
+        #self.radius = math.sqrt(mass / DENSITY)
+        self.radius = 10
         return
 
     # Returns vector for gravitational pull of other Body acting on this Body. Returns an empty array with a single -1.0 if the bodies collide
     def gravitational_force_from_other(self, other):
-        # TODO check if they collide
         d_pos = other.pos - self.pos
         distance_squared = sum(x**2 for x in d_pos)
         if distance_squared < (self.radius + other.radius)**2:
