@@ -21,8 +21,6 @@ class Spawner:
         maxX = int(player.pos[0] + self.size)
         
         randX = random.randint(minX, maxX)
-        print("maxX:" + str(maxX))
-        print("randx"+ str(randX - player.pos[0]))
         minY = int(player.pos[1] - math.sqrt(abs((self.size + player.pos[0]) ** 2 - randX ** 2)))
         maxY = int(player.pos[1] + math.sqrt(abs((self.size + player.pos[0]) ** 2 - randX ** 2)))
         randY = random.randint(minY, maxY)

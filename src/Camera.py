@@ -7,7 +7,7 @@ WINDOW_HEIGHT = 700
 NUM_OF_PARTICLES = 250
 MAP_WIDTH = 3000
 MAP_HEIGHT = 3000
-some_mass_to_zoom_scaling_factor = 50
+some_mass_to_zoom_scaling_factor = 100
 
 class Camera:
     def __init__(self, follow_obj, screen) -> None:
@@ -21,19 +21,18 @@ class Camera:
     def calculate_zoom_based_on_mass(self):
         # Example calculation, needs tuning to fit the game's feel and scale
         # The '-1' ensures that when mass is at a base level, the zoom is neutral (1)
-        return 1 / (self.obj.mass ** 0.5 / some_mass_to_zoom_scaling_factor)
+        return 1 / self.obj.mass
 
-    def update(self):
+    def update(self, target_zoom):
         """
         Update camera parameters according to the player input
         """
         self.offset = self.obj.pos - self.init_pos
-        self.zoom = self.calculate_zoom_based_on_mass()
-    
-    
-        
+        # self.zoom += (0.01 if self.zoom < target_zoom else 0.0)
+        # if self.zoom < target_zoom:
+        #     print("a")
 
-        
+
     def zoom_dist(self, objs):
         """_summary_
         return
