@@ -5,15 +5,15 @@ import pygame as pg
 BIG_G = 1 # Gravitational constant
 
 class Body:
-
     def __init__(self, mass, pos, vel):
-        self.mass
+        self.mass = mass
         self.pos = pos
         self.vel = vel
         return
 
 
 def gravitational_force(first, second):
+    # print("First: " + first.vel)
     distance_squared = sum(x**2 for x in (second.pos - first.pos))
     return BIG_G * first.mass * second.mass / distance_squared
 
@@ -23,7 +23,7 @@ def main():
 
     bodies = []
     for i in range(5):
-        bodies.append(Body(i, [i, i], [i, i])) # Random stuff
+        bodies.append(Body(i, np.array([i, i]), np.array([i, i]))) # Random stuff
 
     for i in bodies:
         net_force = np.array([0, 0])
