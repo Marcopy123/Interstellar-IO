@@ -5,11 +5,11 @@ from Body import Body
 import random
 
 DT = 1 # Delta time for the physics engine
-UPDATES_PER_FRAME = 2 # Number of iterations of the physics engine for each frame
+UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each frame
 
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
-NUM_OF_PARTICLES = 20
+NUM_OF_PARTICLES = 15
 
 
 def draw(bodies: [], screen: pg.Surface):
@@ -34,8 +34,8 @@ def main():
     for i in range(NUM_OF_PARTICLES):
         xPos = float(random.randint(0, WINDOW_WIDTH))
         yPos = float(random.randint(0, WINDOW_HEIGHT))
-        xVel = float(random.randint(0, 3))
-        yVel = float(random.randint(0, 3))
+        xVel = random.random() * 2.0
+        yVel = random.random() * 2.0
         mass = random.randint(100, 1000)
         bodies.append(Body(mass, np.array([xPos, yPos]), np.array([xVel, yVel])))
 
@@ -50,8 +50,19 @@ def main():
                 running = False
         
         for i in range(UPDATES_PER_FRAME):
-            for j in bodies:
-                j.update(DT / UPDATES_PER_FRAME, bodies)
+            current = 0
+            body_count = len(bodies)
+            while current < body_count:
+                merge_count = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1)
+                if merge_count < 0:
+                    # Self was deleted
+                    current -= 1
+                    merge_count *= -1
+
+                body_count -= merge_count
+
+                current += 1
+
 
         draw(bodies, screen)
         pg.display.flip()
