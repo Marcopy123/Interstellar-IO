@@ -1,24 +1,31 @@
 import numpy as np
 import pygame as pg
 
+
+WINDOW_WIDTH = 700
+WINDOW_HEIGHT = 700
+NUM_OF_PARTICLES = 20
+MAP_WIDTH = 3000
+MAP_HEIGHT = 3000
+
 class Camera:
-    def __init__(self, follow_obj, screen) -> None:
-        self.obj = follow_obj
-        self.screen = screen
-        self.init_pos = follow_obj.pos
-        self.offset = np.array([0, 0])
-        
-    def update(self):
-        """
-        Update camera position according to the player
-        """
-        print(self.init_pos)
-        self.offset = self.obj.pos - self.init_pos
-        
-    def draw(self, objs):
-        pg.draw.circle(self.screen, (0, 0, 0), (self.screen.get_size()[0]/2, self.screen.get_size()[1]/2), self.obj.radius)
-        for i in objs:
-            if i != self.obj:
-                pg.draw.circle(self.screen, (0, 0, 0), (i.pos[0] + self.offset[0], i.pos[1] - self.offset[1]), i.radius)
-            
+    def __init__(self, width, height):
+        self.camera = pg.Rect(0, 0, width, height)
+        self.width = width
+        self.height = height
+
+    def apply(self, entity):
+        return entity.rect.move(self.camera.topleft)
+
+    def update(self, target):
+        x = -target.rect.centerx + int(self.width / 2)
+        y = -target.rect.centery + int(self.height / 2)
+
+        # Keep the camera within the map boundaries
+        x = min(0, x)
+        y = min(0, y)
+        x = max(-(self.width - window_width), x)
+        y = max(-(self.height - window_height), y)
+
+        self.camera = pg.Rect(x, y, self.width, self.height)
         

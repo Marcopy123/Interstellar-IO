@@ -3,19 +3,20 @@ import numpy as np
 import pygame as pg
 from Body import Body
 import random
+import Camera as Camera
 
 DT = 1 # Delta time for the physics engine
 UPDATES_PER_FRAME = 2 # Number of iterations of the physics engine for each frame
 
-WINDOW_WIDTH = 800
-WINDOW_HEIGHT = 600
+WINDOW_WIDTH = 700
+WINDOW_HEIGHT = 700
 NUM_OF_PARTICLES = 20
+MAP_WIDTH = 3000
+MAP_HEIGHT = 3000
 
+map_surface = pg.Surface((MAP_WIDTH, MAP_HEIGHT))
+Camera = Camera(WINDOW_WIDTH, WINDOW_HEIGHT)
 
-def draw(bodies: [], screen: pg.Surface):
-    # Draws the body as a square
-    for i in bodies:
-        pg.draw.circle(screen, (0, 0, 0), (i.pos[0], i.pos[1]), i.radius)
 
 
 def main():
@@ -53,7 +54,6 @@ def main():
             for j in bodies:
                 j.update(DT / UPDATES_PER_FRAME, bodies)
 
-        draw(bodies, screen)
         pg.display.flip()
         clock.tick(60)
     
