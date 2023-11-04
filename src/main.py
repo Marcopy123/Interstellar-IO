@@ -45,7 +45,6 @@ def main():
 
     pg.init()
     
-
     pg.display.set_caption("Interstellar IO")
 
     screen = pg.display.set_mode(window_size)
@@ -87,7 +86,6 @@ def main():
                 dforce = camera.obj.mass * ejectedMass * relMassVelocity
                 dforce /= (DT * (1 - ejectedMass))
 
-                #force = camera.obj.mass**2 * DT
                 camera.obj.add_force(direction, dforce)
             
             
@@ -97,8 +95,12 @@ def main():
                  current = 0
             body_count = len(bodies)
             while current < body_count:
-                merges = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1)
+                merges = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1, (bodies[current].uid == camera.obj.uid), spawner.newRadius(camera.obj))
                 for m in merges:
+                    if m[1] == -2:
+                        # Was despawned
+                        if m[0] == current:
+                            current -= 1
 
                     if m[0] == -1:
                         # Self was deleted
