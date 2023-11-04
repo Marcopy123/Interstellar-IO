@@ -2,7 +2,7 @@ import numpy as np
 import math
 
 BIG_G = 1 # Gravitational constant
-DENSITY = 10 # Units of mass per unit of area
+DENSITY = 50 # Units of mass per unit of area
 
 class Body:
 
@@ -10,15 +10,14 @@ class Body:
         self.mass = mass
         self.pos = pos
         self.vel = vel
-        #self.radius = math.sqrt(mass / DENSITY)
-        self.radius = 10
+        self.radius = math.sqrt(mass / DENSITY)
         return
 
     # Returns vector for gravitational pull of other Body acting on this Body. Returns an empty array with a single -1.0 if the bodies collide
     def gravitational_force_from_other(self, other):
         d_pos = other.pos - self.pos
         distance_squared = sum(x**2 for x in d_pos)
-        if distance_squared < (self.radius + other.radius)**2:
+        if distance_squared < (self.radius + other.radius)**2 / 2:
             return np.array([0.0])
         scalar_force = BIG_G * self.mass * other.mass / distance_squared
         unit_vec = d_pos / np.linalg.norm(d_pos)
@@ -36,16 +35,16 @@ class Body:
             if force.size == 1:
                 # Merge
                 big = max(self, j, key=lambda x: x.radius)
-                small = j if big == self else self
+                small = self if big == j else j
 
                 # Conservation of momentum
                 big.vel = ((big.mass * big.vel) + (small.mass * small.vel)) / (big.mass + small.mass)
-
                 big.mass += small.mass
                 big.radius = math.sqrt(big.mass / DENSITY)
-
                 bodies.remove(small)
-
+                
+                if small == self:
+                    break
                 continue
             
             net_force += force

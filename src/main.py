@@ -14,10 +14,8 @@ NUM_OF_PARTICLES = 20
 
 def draw(bodies: [], screen: pg.Surface):
     # Draws the body as a square
-    # TODO change to circle
     for i in bodies:
-        size = i.radius
-        pg.draw.circle(screen, (0, 0, 0), (i.pos[0], i.pos[1]), size)
+        pg.draw.circle(screen, (0, 0, 0), (i.pos[0], i.pos[1]), i.radius)
 
 
 def main():
@@ -38,7 +36,8 @@ def main():
         yPos = float(random.randint(0, WINDOW_HEIGHT))
         xVel = float(random.randint(0, 3))
         yVel = float(random.randint(0, 3))
-        bodies.append(Body(float(i + 1), np.array([xPos, yPos]), np.array([xVel, yVel])))
+        mass = random.randint(100, 1000)
+        bodies.append(Body(mass, np.array([xPos, yPos]), np.array([xVel, yVel])))
 
     clock = pg.time.Clock()
 
@@ -53,7 +52,7 @@ def main():
         for i in range(UPDATES_PER_FRAME):
             for j in bodies:
                 j.update(DT / UPDATES_PER_FRAME, bodies)
-                
+
         draw(bodies, screen)
         pg.display.flip()
         clock.tick(60)
