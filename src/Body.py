@@ -2,7 +2,7 @@ import numpy as np
 import math
 
 BIG_G = 1 # Gravitational constant
-DENSITY = 10 # Units of mass per unit of area
+DENSITY = 5 # Units of mass per unit of area
 
 class Body:
     def __init__(self, mass: float, pos: np.ndarray[np.float64], vel: np.ndarray[np.float64]) -> None:
@@ -16,6 +16,8 @@ class Body:
     def gravitational_force_from_other(self, other):
         d_pos = other.pos - self.pos
         distance_squared = sum(x**2 for x in d_pos)
+        if distance_squared < (self.radius + other.radius)**2 / 2:
+            return np.array([0.0])
         scalar_force = BIG_G * self.mass * other.mass / distance_squared
         unit_vec = d_pos / np.linalg.norm(d_pos)
         return scalar_force * unit_vec

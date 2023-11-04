@@ -13,7 +13,8 @@ class Camera:
         self.obj = follow_obj
         self.screen = screen
         self.init_pos = follow_obj.pos.copy() + np.array([self.screen.get_size()[0]/2 - self.obj.pos[0], self.screen.get_size()[1]/2 - self.obj.pos[1]])
-        self.zoom = 1
+        self.zoom = 0.6
+        self.offset = np.array([0.0, 0])
         
     def update(self):
         """
@@ -24,7 +25,7 @@ class Camera:
         
     def zoom_dist(self, objs):
         """_summary_
-        retur
+        return
         Args:
             objs (list): list of objects
         """

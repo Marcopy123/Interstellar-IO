@@ -11,7 +11,10 @@ UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each fram
 
 WINDOW_WIDTH = 700
 WINDOW_HEIGHT = 700
-NUM_OF_PARTICLES = 15
+NUM_OF_PARTICLES = 25
+
+MIN_ZOOM = 0.1
+MAX_ZOOM = 10.0
 
 def main():
     print("interstellarIO")
@@ -26,21 +29,21 @@ def main():
 
 
     bodies = []
-    for i in range(NUM_OF_PARTICLES):
-        xPos = float(random.randint(0, WINDOW_WIDTH))
-        yPos = float(random.randint(0, WINDOW_HEIGHT))
-        xVel = random.random() * 2.0
-        yVel = random.random() * 2.0
-        mass = random.randint(100, 1000)
-        bodies.append(Body(mass, np.array([xPos, yPos]), np.array([xVel, yVel])))
+    # for i in range(NUM_OF_PARTICLES):
+    #     xPos = float(random.randint(0, WINDOW_WIDTH))
+    #     yPos = float(random.randint(0, WINDOW_HEIGHT))
+    #     xVel = random.random() * 2.0
+    #     yVel = random.random() * 2.0
+    #     mass = random.randint(100, 1000)
+    #     bodies.append(Body(mass, np.array([xPos, yPos]), np.array([xVel, yVel])))
 
-    # sun = Body(2000, np.array([WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2]), np.array([0.0, 0.0]))
-    # earth = Body(500, np.array([WINDOW_WIDTH / 3, WINDOW_HEIGHT / 2]), np.array([0.0, 8.5]))
-    # earth2 = Body(1000, np.array([WINDOW_WIDTH / 4, WINDOW_HEIGHT / 2]), np.array([0.0, 4.0]))
+    sun = Body(2000, np.array([WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2]), np.array([0.0, 0.0]))
+    earth = Body(500, np.array([WINDOW_WIDTH / 3, WINDOW_HEIGHT / 2]), np.array([0.0, 8.5]))
+    earth2 = Body(1000, np.array([WINDOW_WIDTH / 4, WINDOW_HEIGHT / 2]), np.array([0.0, 4.0]))
 
-    # bodies.append(sun)
-    # bodies.append(earth)
-    # bodies.append(earth2)
+    bodies.append(sun)
+    bodies.append(earth)
+    bodies.append(earth2)
     clock = pg.time.Clock()
     camera = Camera(bodies[0], screen)
     spawner = Spawner(bodies[0])
@@ -55,7 +58,7 @@ def main():
                 
             if event.type == pg.MOUSEWHEEL:
                 sensitivity = 0.1
-                if camera.zoom + event.y * sensitivity > 0.5 and camera.zoom + event.y * sensitivity < 10: 
+                if camera.zoom + event.y * sensitivity > MIN_ZOOM and camera.zoom + event.y * sensitivity < MAX_ZOOM: 
                     camera.zoom += event.y * sensitivity
                 print(camera.zoom)
         
@@ -73,11 +76,12 @@ def main():
                 body_count -= merge_count
 
                 current += 1
+
+
         n_particles = len(bodies)
         for i in range(NUM_OF_PARTICLES - n_particles):
-            spawner.spawn()
-        
-        
+            bodies.append(spawner.spawnParticle(sun))
+        # pg.draw.circle(screen, (255, 0, 0), (sun.pos[0] - camera.offset[0], sun.pos[1] - camera.offset[1]), spawner.size * camera.zoom)
         camera.update()
         camera.draw(bodies)
         pg.display.flip()
