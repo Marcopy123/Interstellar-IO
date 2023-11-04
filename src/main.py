@@ -16,8 +16,7 @@ def draw(bodies: [], screen: pg.Surface):
     # TODO change to circle
     for i in bodies:
         size = i.radius
-        body_rect = pg.Surface((size, size))
-        screen.blit(body_rect, (i.pos[0] - size/2, i.pos[1] - size/2))
+        pg.draw.circle(screen, (0, 0, 0), (i.pos[0], i.pos[1]), size)
 
 
 def main():
