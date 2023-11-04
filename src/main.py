@@ -2,13 +2,20 @@ import math
 import numpy as np
 import pygame as pg
 from Body import Body
+import random
 
 BIG_G = 1 # Gravitational constant
 
 pg.init()
-window_size = (1200, 800)
+WINDOW_WIDTH = 1200
+WINDOW_HEIGHT = 800
+NUM_OF_PARTICLES = 100
+
+window_size = (WINDOW_WIDTH, WINDOW_HEIGHT)
 screen = pg.display.set_mode(window_size)
-pg.display.set_caption("Yo mama simulation")
+
+pg.display.set_caption("Interstellar IO")
+
 screen = pg.display.set_mode(window_size)
 
 def gravitational_force(first, second):
@@ -20,8 +27,10 @@ def main():
     print("interstellarIO")
 
     bodies = []
-    for i in range(5):
-        bodies.append(Body(i, [i, i], [i, i])) # Random stuff
+    for i in range(NUM_OF_PARTICLES):
+        xPos = random.randint(0, WINDOW_WIDTH)
+        yPos = random.random(0, WINDOW_HEIGHT)
+        bodies.append(Body(i, [xPos, yPos], [0, 0])) # Random stuff
 
     running = True
     # pygame main loop
