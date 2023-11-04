@@ -4,17 +4,17 @@ import pygame as pg
 from Body import Body
 import random
 
-DT = 1 # Delta time
+DT = 1.0 # Delta time
 
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
-NUM_OF_PARTICLES = 100
+NUM_OF_PARTICLES = 20
 
 
-def draw(bodies, screen : pg.Surface):
+def draw(bodies: [], screen: pg.Surface):
     # Draws the body as a square
-    size = 50
     for i in bodies:
+        size = i.radius
         body_rect = pg.Surface((size, size))
         screen.blit(body_rect, (i.pos[0] - size/2, i.pos[1] - size/2))
 
@@ -32,7 +32,7 @@ def main():
 
 
     bodies = []
-    for i in range(2):
+    for i in range(NUM_OF_PARTICLES):
         xPos = random.randint(0, WINDOW_WIDTH)
         yPos = random.randint(0, WINDOW_HEIGHT)
         bodies.append(Body(float(i + 1), np.array([float(xPos), float(yPos)]), np.array([0.0, 0.0])))
