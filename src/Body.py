@@ -2,7 +2,7 @@ import numpy as np
 import math
 
 BIG_G = 1 # Gravitational constant
-DENSITY = 15 # Units of mass per unit of area
+DENSITY = 25 # Units of mass per unit of area
 
 class Body:
 
@@ -29,7 +29,7 @@ class Body:
     # Otherwise, the size of n is the number of merges that were made, i.e. the number of bodies deleted
     # Additionally, if n is negative, the self object has been merged AND deleted
     def update(self, dt: float, bodies: [], start: int):
-        merge_count = 0
+        merge_count = [0]
         current = start
         body_count = len(bodies)
         while current < body_count:
@@ -48,9 +48,10 @@ class Body:
                 big.radius = math.sqrt(big.mass / DENSITY)
                 bodies.remove(small)
                 
-                merge_count += 1
+                merge_count[0] += 1
                 if small == self:
-                    return (1 * merge_count)
+                    merge_count.append(bodies.index(big))
+                    return merge_count
                 body_count -= 1
                 continue
             

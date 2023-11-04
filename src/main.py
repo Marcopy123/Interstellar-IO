@@ -5,12 +5,12 @@ from Body import Body
 import random
 from Camera import Camera
 
-DT = 1 # Delta time for the physics engine
+DT = 0.5 # Delta time for the physics engine
 UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each frame
 
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
-NUM_OF_PARTICLES = 100
+NUM_OF_PARTICLES = 15
 
 def main():
     print("interstellarIO")
@@ -55,7 +55,6 @@ def main():
                 sensitivity = 0.1
                 if camera.zoom + event.y * sensitivity > 0.5 and camera.zoom + event.y * sensitivity < 10: 
                     camera.zoom += event.y * sensitivity
-                print(camera.zoom)
         
         for i in range(UPDATES_PER_FRAME):
             for j in bodies:
@@ -63,12 +62,14 @@ def main():
             body_count = len(bodies)
             while current < body_count:
                 merge_count = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1)
-                if merge_count < 0:
+                if len(merge_count) > 1:
+                    # Self was deleted
+                    if current == 0:
+                        camera.obj = bodies[merge_count[1]]
                     # Self was deleted
                     current -= 1
-                    merge_count *= -1
 
-                body_count -= merge_count
+                body_count -= merge_count[0]
 
                 current += 1
 
