@@ -1,6 +1,7 @@
 import numpy as np
 import pygame as pg
 import math
+from main import draw_fading_circle
 
 WINDOW_WIDTH = 700
 WINDOW_HEIGHT = 700
