@@ -12,6 +12,7 @@ from TimeSlider import TimeSlider
 from ParticlesSlider import ParticlesSlider
 from SpaceTimeButton import SpaceTimeButton
 from AltButton import AltButton
+import time
 
 DT = 0.3 # Delta time for the physics engine
 UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each frame
@@ -114,6 +115,7 @@ window_size = (WINDOW_WIDTH, WINDOW_HEIGHT)
 screen = pg.display.set_mode(window_size)
 # In your main game loop, before drawing anything else:
 
+
 def set_gravitational_constant(value):
     global G
     BodyFile.G = value
@@ -154,6 +156,8 @@ def main(render_mode: int):
     camera = Camera(bodies[0], screen)
     targetZoom = camera.calculate_zoom_based_on_mass()
     spawner = Spawner(bodies[0], SPAWN_SEED)
+
+    fade_circle_surface = pg.Surface((screen.get_size()), pg.SRCALPHA)
 
     if render_mode == 0:
         # First round of spawning is anywhere around the player, not at the edge of the spawn circle
@@ -219,7 +223,7 @@ def main(render_mode: int):
                  current = 0
             body_count = len(bodies)
             while current < body_count:
-                merges = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1, (bodies[current].uid == camera.obj.uid), spawner.newRadius(camera.obj), ALT_REND)
+                merges = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1, (bodies[current].uid == camera.obj.uid), spawner.newRadius(camera.obj), ALT_REND, camera)
                 for m in merges:
 
                     if m[0] == -1:
@@ -258,7 +262,7 @@ def main(render_mode: int):
             NUM_OF_PARTICLES = int(particlesSlider.get_value())
         
         camera.update(targetZoom)
-        camera.draw(bodies, camera.obj)
+        camera.draw(bodies, camera.obj, fade_circle_surface)
     
         numOfSolarMasses = camera.obj.mass / (195000)
 
@@ -270,6 +274,8 @@ def main(render_mode: int):
         screen.blit(gValueText, (230, 15))
         screen.blit(timeValueText, (230, 45))
         screen.blit(numParticlesText, (230, 75))
+
+        screen.blit(fade_circle_surface, (0, 0))
         
         screen.blit(gText, (60, 25))
         screen.blit(timeFactor, (90, 55))

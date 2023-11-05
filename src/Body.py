@@ -47,7 +47,7 @@ class Body:
     # If n is 0, no merges were done (no bodies)
     # Otherwise, the size of n is the number of merges that were made, i.e. the number of bodies deleted
     # Additionally, if n is negative, the self object has been merged AND deleted
-    def update(self, dt: float, bodies: [], start: int, check_despawn: bool, spawn_radius: float, alt_rendering: bool):
+    def update(self, dt: float, bodies: [], start: int, check_despawn: bool, spawn_radius: float, alt_rendering: bool, camera):
             
         if self.id % (1 / self.trail_density) == 0:
             if len(self.trail) < self.max_trail:
@@ -88,7 +88,11 @@ class Body:
                 big.mass += small.mass
                 big.target_radius = int(5 * math.sqrt(big.mass / DENSITY)) / 5
                 bodies.remove(small)
-                big.update_form()
+                
+                updated_form = big.update_form()
+                if updated_form and big.uid == camera.obj.uid:
+                    camera.fade_circle = True
+
 
                 merges.append([small.uid, big.uid])
                 
@@ -132,6 +136,8 @@ class Body:
         if self.state != old_state:
             idx = random.randint(1,4)
             self.image = pg.image.load(f"Images/{self.state}/{idx}.png")
+            return True
+        return False
         
     def add_force(self, direction : np.ndarray, force):
         self.net_force = direction * force / self.mass
