@@ -9,9 +9,10 @@ class TimeSlider():
         self.rect = pygame.Rect(x, y, w, h)
         self.min_val = min_val
         self.max_val = max_val
-        self.val = start_val  # The value the slider starts at
-        # Calculate the position of the slider handle based on the start_val
-        self.handle_rect = pygame.Rect(x + (start_val - min_val) / (max_val - min_val) * w, y - HANDLE_RADIUS, HANDLE_RADIUS * 2, HANDLE_RADIUS * 2)
+        self.val = start_val
+        # Calculate the position of the handle based on start_val
+        handle_x = x + ((start_val - min_val) / (max_val - min_val)) * w
+        self.handle_rect = pygame.Rect(handle_x - HANDLE_RADIUS, y - (HANDLE_RADIUS - h/2), HANDLE_RADIUS*2, HANDLE_RADIUS*2)
         self.active = False
 
     def handle_event(self, event):
