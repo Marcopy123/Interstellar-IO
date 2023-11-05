@@ -189,11 +189,12 @@ def main(render_mode: int):
                 else:
                     camera.zoom -= camera.zoom * sensitivity
             elif event.type == pg.KEYDOWN and render_mode == 1:
-                # Switch camera to next body
-                next_body = bodies.index(camera.obj) + 1
-                if next_body >= len(bodies):
-                    next_body = 0
-                camera.obj = bodies[next_body]
+                if pg.key.get_pressed()[pg.K_RETURN]:
+                    # Switch camera to next body
+                    next_body = bodies.index(camera.obj) + 1
+                    if next_body >= len(bodies):
+                        next_body = 0
+                    camera.obj = bodies[next_body]
                     
             if pg.key.get_pressed()[pg.K_SPACE]:
                 
