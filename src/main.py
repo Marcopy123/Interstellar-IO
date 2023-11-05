@@ -115,25 +115,6 @@ window_size = (WINDOW_WIDTH, WINDOW_HEIGHT)
 screen = pg.display.set_mode(window_size)
 # In your main game loop, before drawing anything else:
 
-def draw_fading_circle(surface, pos, max_radius, duration):
-    center = (pos // 2, pos // 2)
-    start_time = time.time()
-    clock = pg.time.Clock()
-    while time.time() - start_time < duration:
-        elapsed_time = time.time() - start_time
-        alpha = max(0, 255 - (255 * (elapsed_time / duration)))
-        radius = int(max_radius * (elapsed_time / duration))
-
-        # Create a new surface with per-pixel alpha to draw the circle with alpha transparency
-        circle_surface = pg.Surface((max_radius * 2, max_radius * 2), pg.SRCALPHA)
-        pg.draw.circle(circle_surface, (255, 255, 255, int(alpha)), (max_radius, max_radius), radius)
-
-        surface.fill(BLACK)
-        surface.blit(circle_surface, (center[0] - max_radius, center[1] - max_radius))
-        pg.display.flip()
-
-        # Control the frame rate
-        clock.tick(60)
 
 def set_gravitational_constant(value):
     global G
@@ -175,6 +156,8 @@ def main(render_mode: int):
     camera = Camera(bodies[0], screen)
     targetZoom = camera.calculate_zoom_based_on_mass()
     spawner = Spawner(bodies[0], SPAWN_SEED)
+
+    fade_circle_surface = pg.Surface((screen.get_size()), pg.SRCALPHA)
 
     if render_mode == 0:
         # First round of spawning is anywhere around the player, not at the edge of the spawn circle
@@ -240,7 +223,7 @@ def main(render_mode: int):
                  current = 0
             body_count = len(bodies)
             while current < body_count:
-                merges = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1, (bodies[current].uid == camera.obj.uid), spawner.newRadius(camera.obj), ALT_REND)
+                merges = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1, (bodies[current].uid == camera.obj.uid), spawner.newRadius(camera.obj), ALT_REND, camera)
                 for m in merges:
 
                     if m[0] == -1:
@@ -279,7 +262,7 @@ def main(render_mode: int):
             NUM_OF_PARTICLES = int(particlesSlider.get_value())
         
         camera.update(targetZoom)
-        camera.draw(bodies, camera.obj)
+        camera.draw(bodies, camera.obj, fade_circle_surface)
     
         numOfSolarMasses = camera.obj.mass / (195000)
 
@@ -291,6 +274,8 @@ def main(render_mode: int):
         screen.blit(gValueText, (230, 15))
         screen.blit(timeValueText, (230, 45))
         screen.blit(numParticlesText, (230, 75))
+
+        screen.blit(fade_circle_surface, (0, 0))
         
         screen.blit(gText, (60, 25))
         screen.blit(timeFactor, (90, 55))
