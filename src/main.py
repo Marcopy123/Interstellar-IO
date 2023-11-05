@@ -32,23 +32,29 @@ WHITE = (255,255,255)
 GREEN = (60, 250, 60)
 
 ALT_REND = False
+CURVE_SPACETIME = False
 SPAWN_SEED = -1
 
 def toggleAltRendering():
     global ALT_REND
     ALT_REND = not ALT_REND
 
+def toggleSpacetime():
+    global CURVE_SPACETIME
+    CURVE_SPACETIME = not CURVE_SPACETIME
+
 gravitySlider = GravitySlider(20, 20, SLIDER_LENGTH, SLIDER_HEIGHT, 0.1, 20, BodyFile.G)
 timeSlider = TimeSlider(20, 50, SLIDER_LENGTH, SLIDER_HEIGHT, 0.01, 3, DT)
 particlesSlider = ParticlesSlider(20, 80, SLIDER_LENGTH, SLIDER_HEIGHT, 1, 100, NUM_OF_PARTICLES)
 
 altButton = Button(300, 20, 50, 20, toggleAltRendering)
+spacetimeButton = Button(300, 50, 50, 20, toggleSpacetime)
 
 def create_text_surface(text, font, color):
     text_surface = font.render(text, True, color)
     return text_surface
 
-def do_calculation(width, height, grid_count, gravity_points, gravity_force=2000):
+def do_calculation(width, height, grid_count, gravity_points, curve_spacetime: bool, curve_all: bool, gravity_force=2000):
     grid = []
 
     for yi in range(grid_count):
@@ -57,16 +63,26 @@ def do_calculation(width, height, grid_count, gravity_points, gravity_force=2000
             x = (width / grid_count) * xi
             y = (height / grid_count) * yi
 
+            if not curve_spacetime:
+                row.append([x, y])
+                continue
+
             for body in gravity_points:
+                if body.mass < 1000 and not curve_all:
+                    print('skipped')
+                    continue
                 px = body.pos[0]
                 py = body.pos[1]
                 dx = px - x
                 dy = py - y
                 d = dx**2 + dy**2
+                if d < body.radius:
+                    continue
                 if d > 0:
                     a = np.arctan2(dy, dx)
-                    f = gravity_force / d * (body.mass / 500)
+                    f = gravity_force / d * math.sqrt(body.mass / 1000)
                     f = f if f < d else d
+                    f = min(f, 6)
                     x += np.cos(a) * f
                     y += np.sin(a) * f
 
@@ -74,7 +90,7 @@ def do_calculation(width, height, grid_count, gravity_points, gravity_force=2000
         grid.append(row)
     return np.array(grid)
 
-def draw_grid(surface, grid_color, cell_size, offset, gravity_points):
+def draw_grid(surface, grid_color, cell_size, offset, gravity_points, curve_spacetime: bool, curve_all: bool):
     """
     Draws a warped grid on the given surface with respect to gravity points.
     Args:
@@ -85,7 +101,8 @@ def draw_grid(surface, grid_color, cell_size, offset, gravity_points):
     """
     width, height = 1000,1000
     grid_count = max(width, height) // cell_size  # Number of cells in the largest dimension
-    warped_grid = do_calculation(width, height, grid_count, gravity_points)
+
+    warped_grid = do_calculation(width, height, grid_count, gravity_points, curve_spacetime, curve_all)
 
     # Draw the warped grid lines
     for yi in range(grid_count):
@@ -115,6 +132,7 @@ def main(render_mode: int):
     global NUM_OF_PARTICLES
     global ALT_REND
     global SPAWN_SEED
+    global CURVE_SPACETIME
     print("interstellarIO")
 
     pg.init()
@@ -163,6 +181,7 @@ def main(render_mode: int):
             timeSlider.handle_event(event)
             particlesSlider.handle_event(event)
             altButton.handle_event(event)
+            spacetimeButton.handle_event(event)
             if event.type == pg.MOUSEWHEEL:
                 sensitivity = 0.1
                 if camera.zoom + event.y * sensitivity > MIN_ZOOM or event.y > 0:
@@ -189,11 +208,12 @@ def main(render_mode: int):
 
                 camera.obj.add_force(direction, dforce)
             
-        draw_grid(screen, grid_color, cell_size, camera.offset, bodies)
+        draw_grid(screen, grid_color, cell_size, camera.offset, bodies, CURVE_SPACETIME, (render_mode == 1))
         gravitySlider.draw(screen)
         timeSlider.draw(screen)
         particlesSlider.draw(screen)
         altButton.draw(screen, WHITE, GREEN)
+        spacetimeButton.draw(screen, WHITE, GREEN)
 
         for i in range(UPDATES_PER_FRAME):
             for j in bodies:
@@ -223,7 +243,8 @@ def main(render_mode: int):
         gValueText = create_text_surface(str(round(BodyFile.G, 2)), FONT1, WHITE)
         timeValueText = create_text_surface(str(round(DT, 2)), FONT1, WHITE)
         numParticlesText = create_text_surface(str(NUM_OF_PARTICLES), FONT1, WHITE)
-        altButtonText = create_text_surface(str(f"Alternate rendering: {ALT_REND}"), FONT1, WHITE)
+        altButtonText = create_text_surface(f"Alternate simulation: {ALT_REND}", FONT1, WHITE)
+        spacetimeText = create_text_surface(f"Visualize spacetime: {CURVE_SPACETIME}", FONT1, WHITE)
 
         
 
@@ -239,6 +260,7 @@ def main(render_mode: int):
         screen.blit(timeFactor, (90, 55))
         screen.blit(numParticles, (70, 90))
         screen.blit(altButtonText, (370, 20))
+        screen.blit(spacetimeText, (370, 50))
 
         n_particles = len(bodies)
         for i in range(NUM_OF_PARTICLES - n_particles):
