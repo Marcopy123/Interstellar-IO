@@ -198,7 +198,7 @@ def main(render_mode: int):
 
         currentMassText = create_text_surface("Current mass: " + str(round(numOfSolarMasses, 6)) + "sol", FONT1, BLACK)
         
-        currentStateText = create_text_surface("You currently have the mass of:" + str(camera.obj.state), FONT1, BLACK)
+        currentStateText = create_text_surface("You currently have the mass of: " + str(camera.obj.state), FONT1, BLACK)
         screen.blit(currentMassText, (25, 630))
         screen.blit(currentStateText, (25, 660))
         print(camera.obj.state)
