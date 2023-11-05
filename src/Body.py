@@ -1,7 +1,7 @@
 import numpy as np
 import math
 
-BIG_G = 1 # Gravitational constant
+G = 1 # Gravitational constant
 DENSITY = 25 # Units of mass per unit of area
 
 class Body:
@@ -19,7 +19,7 @@ class Body:
         distance_squared = sum(x**2 for x in d_pos)
         if distance_squared < (self.radius + other.radius)**2 / 2:
             return np.array([0.0])
-        scalar_force = BIG_G * self.mass * other.mass / distance_squared
+        scalar_force = G * self.mass * other.mass / distance_squared
         unit_vec = d_pos / np.linalg.norm(d_pos)
         return scalar_force * unit_vec
 

@@ -5,6 +5,10 @@ from Body import Body
 import random
 from Camera import Camera
 from Spawner import Spawner
+from GravitySlider import GravitySlider
+import Body as BodyFile
+from TimeSlider import TimeSlider
+from ParticlesSlider import ParticlesSlider
 
 DT = 0.5 # Delta time for the physics engine
 UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each frame
@@ -14,6 +18,25 @@ WINDOW_HEIGHT = 700
 NUM_OF_PARTICLES = 25
 MIN_ZOOM = 0.1
 MAX_ZOOM = 10
+SLIDER_LENGTH = 200
+SLIDER_HEIGHT = 5
+
+# font = pg.font.Font('freesansbold.ttf', 32)
+pg.init()
+FONT1 = pg.font.Font(None, 30)
+FONT2 = pg.font.Font(None, 20)
+
+# Set up colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+
+gravitySlider = GravitySlider(20, 20, SLIDER_LENGTH, SLIDER_HEIGHT, 1, 20, BodyFile.G)
+timeSlider = TimeSlider(20, 50, SLIDER_LENGTH, SLIDER_HEIGHT, 0.05, 3, DT)
+particlesSlider = ParticlesSlider(20, 80, SLIDER_LENGTH, SLIDER_HEIGHT, 1, 100, NUM_OF_PARTICLES)
+
+def create_text_surface(text, font, color):
+    text_surface = font.render(text, True, color)
+    return text_surface
 
 def draw_grid(surface, grid_color, cell_size, offset):
     """
@@ -40,7 +63,13 @@ screen = pg.display.set_mode(window_size)
 # In your main game loop, before drawing anything else:
 screen.fill((0, 0, 0))  # Fill the screen with black or your desired background color
 
+def set_gravitational_constant(value):
+    global G
+    BodyFile.G = value
+
 def main():
+    global DT
+    global NUM_OF_PARTICLES
     print("interstellarIO")
 
     pg.init()
@@ -69,7 +98,9 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running = False
-                
+            gravitySlider.handle_event(event)
+            timeSlider.handle_event(event)
+            particlesSlider.handle_event(event)
             if event.type == pg.MOUSEWHEEL:
                 sensitivity = 0.1
                 if camera.zoom + event.y * sensitivity > MIN_ZOOM and camera.zoom + event.y * sensitivity < MAX_ZOOM: 
@@ -84,8 +115,10 @@ def main():
                 print(direction)
                 force = 5 * camera.obj.mass** 2 * DT
                 camera.obj.add_force(direction, force)
-            
-            
+        draw_grid(screen, grid_color, cell_size, camera.offset)     
+        gravitySlider.draw(screen)    
+        timeSlider.draw(screen)
+        particlesSlider.draw(screen)
         
         for i in range(UPDATES_PER_FRAME):
             for j in bodies:
@@ -112,13 +145,31 @@ def main():
                 body_count -= len(merges)
                 current += 1
 
+        
+        gValueText = create_text_surface(str(round(BodyFile.G, 2)), FONT1, BLACK)
+        timeValueText = create_text_surface(str(round(DT, 2)), FONT1, BLACK)
+        numParticlesText = create_text_surface(str(NUM_OF_PARTICLES), FONT1, BLACK)
+
+        gText = create_text_surface("Gravitational Constant", FONT2, BLACK)
+        timeFactor = create_text_surface("Time Factor", FONT2, BLACK)
+        numParticles = create_text_surface("Number of particles", FONT2, BLACK)
+
+        screen.blit(gValueText, (230, 15))
+        screen.blit(timeValueText, (230, 45))
+        screen.blit(numParticlesText, (230, 75))
+
+        screen.blit(gText, (60, 25))
+        screen.blit(timeFactor, (90, 55))
+        screen.blit(numParticles, (70, 90))
 
         n_particles = len(bodies)
         for i in range(NUM_OF_PARTICLES - n_particles):
             bodies.append(spawner.spawnParticle(camera.obj, next_player_uid))
             next_player_uid += 1
-
-        draw_grid(screen, grid_color, cell_size, camera.offset)
+        set_gravitational_constant(gravitySlider.get_value())
+        DT = timeSlider.get_value()
+        NUM_OF_PARTICLES = int(particlesSlider.get_value())
+        
         camera.update(targetZoom)
         camera.draw(bodies)
         pg.display.flip()
