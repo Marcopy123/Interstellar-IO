@@ -9,8 +9,9 @@ class ParticlesSlider():
         self.rect = pygame.Rect(x, y, w, h)
         self.min_val = min_val
         self.max_val = max_val
-        self.val = start_val
-        self.handle_rect = pygame.Rect(x, y - (HANDLE_RADIUS - h//2), HANDLE_RADIUS*2, HANDLE_RADIUS*2)
+        self.val = start_val  # The value the slider starts at
+        # Calculate the position of the slider handle based on the start_val
+        self.handle_rect = pygame.Rect(x + (start_val - min_val) / (max_val - min_val) * w, y - HANDLE_RADIUS, HANDLE_RADIUS * 2, HANDLE_RADIUS * 2)
         self.active = False
 
     def handle_event(self, event):
