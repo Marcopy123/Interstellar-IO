@@ -19,6 +19,8 @@ class Body:
         self.trail_density = 0.25
         self.id = 0
         
+        self.state = ""
+        
     # Returns vector for gravitational pull of other Body acting on this Body
     def gravitational_force_from_other(self, other):
         d_pos = other.pos - self.pos
@@ -36,6 +38,7 @@ class Body:
     # Otherwise, the size of n is the number of merges that were made, i.e. the number of bodies deleted
     # Additionally, if n is negative, the self object has been merged AND deleted
     def update(self, dt: float, bodies: [], start: int, check_despawn: bool, spawn_radius: float):
+            
         if self.id % (1 / self.trail_density) == 0:
             if len(self.trail) < self.max_trail:
                 self.trail.append(self.pos.copy())
@@ -70,9 +73,10 @@ class Body:
                 big.mass += small.mass
                 big.radius = math.sqrt(big.mass / DENSITY)
                 bodies.remove(small)
+                big.update_form()
 
                 merges.append([small.uid, big.uid])
-
+                
                 if small == self:
                     return merges
                 
@@ -90,5 +94,23 @@ class Body:
         self.net_force = np.array([0.0, 0.0])
         return merges
     
+    def update_form(self):
+        self.state = "Asteroid"
+        if(self.mass > 10 ** 3 and self.mass <= 10 ** 4):
+            self.state = "Protoplanet"
+        elif(self.mass > 10 ** 4 and self.mass <= 10 ** 5):
+            self.state = "Jovian Planet"
+        elif(self.mass > 10 ** 5 and self.mass <= 10 ** 6):
+            self.state = "Brown Dwarf"
+        elif(self.mass > 10 ** 6 and self.mass <= 10 ** 7):
+            self.state = "Yellow Dwarf"
+        elif(self.mass > 10 ** 7 and self.mass <= 10 ** 8):
+            self.state = "Giant"
+        elif(self.mass > 10 ** 8 and self.mass <= 10 ** 9):
+            self.state = "Supergiant"
+        elif(self.mass > 10 ** 9 and self.mass <= 10 ** 10):
+            self.state = "Black Hole"
+            
+        
     def add_force(self, direction : np.ndarray, force):
         self.net_force = direction * force / self.mass
