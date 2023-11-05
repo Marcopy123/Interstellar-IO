@@ -1,8 +1,10 @@
 import numpy as np
 import math
+import random
+import pygame as pg
 
 G = 1 # Gravitational constant
-DENSITY = 25 # Units of mass per unit of area
+DENSITY = 10 # Units of mass per unit of area
 DESPAWN_RADIUS = 350
 
 class Body:
@@ -21,6 +23,9 @@ class Body:
         self.id = 0
         
         self.state = ""
+        self.image = None
+        self.update_form()
+        
         
     # Returns vector for gravitational pull of other Body acting on this Body
     def gravitational_force_from_other(self, other):
@@ -100,22 +105,28 @@ class Body:
         return merges
     
     def update_form(self):
-        self.state = "Asteroid"
+        old_state = self.state
+        
+        self.state = "Asteroids"
         if(self.mass > 10 ** 3 and self.mass <= 10 ** 4):
-            self.state = "Protoplanet"
+            self.state = "Protoplanets"
         elif(self.mass > 10 ** 4 and self.mass <= 10 ** 5):
-            self.state = "Jovian Planet"
+            self.state = "JovianPlanets"
         elif(self.mass > 10 ** 5 and self.mass <= 10 ** 6):
-            self.state = "Brown Dwarf"
+            self.state = "BrownDwarfs"
         elif(self.mass > 10 ** 6 and self.mass <= 10 ** 7):
-            self.state = "Yellow Dwarf"
+            self.state = "YellowDwarfs"
         elif(self.mass > 10 ** 7 and self.mass <= 10 ** 8):
-            self.state = "Giant"
+            self.state = "RedGiant"
         elif(self.mass > 10 ** 8 and self.mass <= 10 ** 9):
             self.state = "Supergiant"
         elif(self.mass > 10 ** 9 and self.mass <= 10 ** 10):
-            self.state = "Black Hole"
-            
+            self.state = "BlackHole"
+        
+        # choose a random image to assign if there is a phase change
+        if self.state != old_state:
+            idx = random.randint(1,4)
+            self.image = pg.image.load(f"Images/{self.state}/{idx}.png")
         
     def add_force(self, direction : np.ndarray, force):
         self.net_force = direction * force / self.mass

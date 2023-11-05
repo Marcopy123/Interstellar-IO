@@ -51,4 +51,5 @@ class Camera:
             # Draw object
             x_pos = (i.pos[0] - self.offset[0] - self.screen.get_size()[0] / 2) * self.zoom + self.screen.get_size()[0] / 2
             y_pos = (i.pos[1] - self.offset[1] - self.screen.get_size()[1] / 2) * self.zoom + self.screen.get_size()[1] / 2
-            pg.draw.circle(self.screen, (0, 0, 0), (x_pos, y_pos), i.radius * self.zoom)
+            img = pg.transform.scale(i.image, (i.radius * self.zoom * 3, i.radius * self.zoom * 3))
+            self.screen.blit(img, (x_pos - i.radius * self.zoom * 3/2 , y_pos - i.radius * self.zoom * 3/2))

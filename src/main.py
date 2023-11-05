@@ -103,7 +103,8 @@ def main():
             particlesSlider.handle_event(event)
             if event.type == pg.MOUSEWHEEL:
                 sensitivity = 0.1
-                if camera.zoom + event.y * sensitivity > MIN_ZOOM and camera.zoom + event.y * sensitivity < MAX_ZOOM: 
+                if camera.zoom + event.y * sensitivity > MIN_ZOOM: 
+                    print(camera.zoom)
                     camera.zoom += event.y * sensitivity
                     
             if pg.key.get_pressed()[pg.K_SPACE]:
