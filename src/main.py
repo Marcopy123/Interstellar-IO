@@ -98,7 +98,7 @@ def draw_grid(surface, grid_color, cell_size, offset, gravity_points, curve_spac
     - cell_size: The size of each cell in the grid.
     - gravity_points: A list of tuples representing the positions of gravity points.
     """
-    width, height = 1000,1000
+    width, height = 3000,3000
     grid_count = max(width, height) // cell_size  # Number of cells in the largest dimension
 
     warped_grid = do_calculation(width, height, grid_count, gravity_points, curve_spacetime, curve_all)
@@ -208,11 +208,7 @@ def main(render_mode: int):
                 camera.obj.add_force(direction, dforce)
             
         draw_grid(screen, grid_color, cell_size, camera.offset, bodies, CURVE_SPACETIME, (render_mode == 1))
-        gravitySlider.draw(screen)
-        timeSlider.draw(screen)
-        particlesSlider.draw(screen)
-        altButton.draw(screen, WHITE, GREEN)
-        spacetimeButton.draw(screen, WHITE, GREEN)
+        
 
         for i in range(UPDATES_PER_FRAME):
             for j in bodies:
@@ -235,7 +231,6 @@ def main(render_mode: int):
                                 #if ntargetZoom != targetZoom:
                                     #print("a")
                                 break
-
                 body_count -= len(merges)
                 current += 1
 
@@ -245,21 +240,9 @@ def main(render_mode: int):
         altButtonText = create_text_surface(f"Alternate simulation: {ALT_REND}", FONT1, WHITE)
         spacetimeText = create_text_surface(f"Visualize spacetime: {CURVE_SPACETIME}", FONT1, WHITE)
 
-        
-
         gText = create_text_surface("Gravitational Constant", FONT2, WHITE)
         timeFactor = create_text_surface("Time Factor", FONT2, WHITE)
         numParticles = create_text_surface("Number of particles", FONT2, WHITE)
-
-        screen.blit(gValueText, (230, 15))
-        screen.blit(timeValueText, (230, 45))
-        screen.blit(numParticlesText, (230, 75))
-        
-        screen.blit(gText, (60, 25))
-        screen.blit(timeFactor, (90, 55))
-        screen.blit(numParticles, (70, 90))
-        screen.blit(altButtonText, (370, 20))
-        screen.blit(spacetimeText, (370, 50))
 
         n_particles = len(bodies)
         for i in range(NUM_OF_PARTICLES - n_particles):
@@ -280,6 +263,20 @@ def main(render_mode: int):
         currentStateText = create_text_surface("You currently have the mass of: " + str(camera.obj.state), FONT1, WHITE)
         screen.blit(currentMassText, (25, 630))
         screen.blit(currentStateText, (25, 660))
+        screen.blit(gValueText, (230, 15))
+        screen.blit(timeValueText, (230, 45))
+        screen.blit(numParticlesText, (230, 75))
+        
+        screen.blit(gText, (60, 25))
+        screen.blit(timeFactor, (90, 55))
+        screen.blit(numParticles, (70, 90))
+        screen.blit(altButtonText, (370, 20))
+        screen.blit(spacetimeText, (370, 50))
+        gravitySlider.draw(screen)
+        timeSlider.draw(screen)
+        particlesSlider.draw(screen)
+        altButton.draw(screen, WHITE, GREEN)
+        spacetimeButton.draw(screen, WHITE, GREEN)
         pg.display.flip()
         clock.tick(60)
     
