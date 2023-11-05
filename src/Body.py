@@ -4,7 +4,7 @@ import random
 import pygame as pg
 
 G = 1 # Gravitational constant
-DENSITY = 10 # Units of mass per unit of area
+DENSITY = 20 # Units of mass per unit of area
 DESPAWN_RADIUS = 350
 
 class Body:

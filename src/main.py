@@ -11,7 +11,7 @@ import Body as BodyFile
 from TimeSlider import TimeSlider
 from ParticlesSlider import ParticlesSlider
 
-DT = 0.5 # Delta time for the physics engine
+DT = 0.3 # Delta time for the physics engine
 UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each frame
 
 WINDOW_WIDTH = 700
@@ -48,10 +48,10 @@ def draw_grid(surface, grid_color, cell_size, offset):
     """
     width, height = surface.get_size()
     # Draw vertical lines
-    for x in range(0, 64 * width, cell_size):
+    for x in range(0, 500 * width, cell_size):
         pg.draw.line(surface, grid_color, (x - offset[0], 0), (x - offset[0], height))
     # Draw horizontal lines
-    for y in range(0, 64 * height, cell_size):
+    for y in range(0, 500 * height, cell_size):
         pg.draw.line(surface, grid_color, (0, y - offset[1]), (width, y - offset[1]))
 
 # Usage example within your game loop:
@@ -103,7 +103,7 @@ def main(render_mode: int):
     running = True
     # pygame main loop
     while running:
-        screen.fill((4,12,36))
+        screen.fill((0,0,0))
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running = False
@@ -160,15 +160,15 @@ def main(render_mode: int):
                 body_count -= len(merges)
                 current += 1
 
-        gValueText = create_text_surface(str(round(BodyFile.G, 2)), FONT1, BLACK)
-        timeValueText = create_text_surface(str(round(DT, 2)), FONT1, BLACK)
-        numParticlesText = create_text_surface(str(NUM_OF_PARTICLES), FONT1, BLACK)
+        gValueText = create_text_surface(str(round(BodyFile.G, 2)), FONT1, WHITE)
+        timeValueText = create_text_surface(str(round(DT, 2)), FONT1, WHITE)
+        numParticlesText = create_text_surface(str(NUM_OF_PARTICLES), FONT1, WHITE)
 
         
 
-        gText = create_text_surface("Gravitational Constant", FONT2, BLACK)
-        timeFactor = create_text_surface("Time Factor", FONT2, BLACK)
-        numParticles = create_text_surface("Number of particles", FONT2, BLACK)
+        gText = create_text_surface("Gravitational Constant", FONT2, WHITE)
+        timeFactor = create_text_surface("Time Factor", FONT2, WHITE)
+        numParticles = create_text_surface("Number of particles", FONT2, WHITE)
 
 
 
@@ -195,9 +195,9 @@ def main(render_mode: int):
     
         numOfSolarMasses = camera.obj.mass / (195000)
 
-        currentMassText = create_text_surface("Current mass: " + str(round(numOfSolarMasses, 6)) + "sol", FONT1, BLACK)
+        currentMassText = create_text_surface("Current mass: " + str(round(numOfSolarMasses, 6)) + "sol", FONT1, WHITE)
         
-        currentStateText = create_text_surface("You currently have the mass of:" + str(camera.obj.state), FONT1, BLACK)
+        currentStateText = create_text_surface("You currently have the mass of: " + str(camera.obj.state), FONT1, WHITE)
         screen.blit(currentMassText, (25, 630))
         screen.blit(currentStateText, (25, 660))
         print(camera.obj.state)
