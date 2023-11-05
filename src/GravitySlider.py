@@ -33,5 +33,4 @@ class GravitySlider():
         pygame.draw.circle(surface, COLOR_INACTIVE if not self.active else COLOR_ACTIVE, self.handle_rect.center, HANDLE_RADIUS)
 
     def get_value(self):
-        print("Big g: " + str(self.val))
         return self.val
