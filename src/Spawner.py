@@ -34,7 +34,7 @@ class Spawner:
         elif massAlgorithm < 0.15:
             massOfParticle = random.randint(int(player.mass/30), int(player.mass/15))
         else:
-            massOfParticle = random.randint(10, int(6 * math.sqrt(player.mass)))
+            massOfParticle = random.randint(int(1/2 * math.sqrt(player.mass)), int(6 * math.sqrt(player.mass)))
 
         minX = int(player.pos[0] - self.size)
         maxX = int(player.pos[0] + self.size)

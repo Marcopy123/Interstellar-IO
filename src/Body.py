@@ -18,9 +18,10 @@ class Body:
         self.net_force = np.array([0.0, 0.0])
         
         self.trail = []
-        self.max_trail = 30
-        self.trail_density = 0.25
+        self.max_trail = 15
+        self.trail_density = 0.50
         self.id = 0
+        self.trail_thick = 1
         
         self.state = ""
         self.image = None
@@ -124,7 +125,7 @@ class Body:
             self.state = "RedGiant"
         elif(self.mass > 10 ** 8 and self.mass <= 10 ** 9):
             self.state = "SuperGiant"
-        elif(self.mass > 10 ** 9 and self.mass <= 10 ** 10):
+        elif(self.mass > 10 ** 9):
             self.state = "BlackHoles"
         
         # choose a random image to assign if there is a phase change
