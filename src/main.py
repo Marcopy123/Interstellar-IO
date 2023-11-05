@@ -185,7 +185,7 @@ def main(render_mode: int):
             if event.type == pg.MOUSEWHEEL:
                 sensitivity = 0.1
                 if camera.zoom + event.y * sensitivity > MIN_ZOOM or event.y > 0:
-                    camera.zoom += event.y * camera.zoomf * sensitivity
+                    camera.zoom += event.y * camera.zoom * sensitivity
                 else:
                     camera.zoom -= camera.zoom * sensitivity
             elif event.type == pg.KEYDOWN and render_mode == 1:
