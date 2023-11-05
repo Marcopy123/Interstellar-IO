@@ -43,22 +43,23 @@ class Camera:
     def color_from_speed(self, speed):
         # the most cursed thing you'll ever see
         # TODO work in progress
-        speed = int(speed / 10)
-        color = [0, 0, 255]
+        speed = int(speed)
+        color = [0, 0, 190]
         color[1] += speed
-        speed -= 255
-        if speed <= 0:
-            color[1] = 255
+        speed -= 190
+        if speed >= 0:
+            color[1] = 190
             color[2] -= speed
-            speed -= 255
-            if speed <= 0:
+            speed -= 190
+            if speed >= 0:
                 color[2] = 0
                 color[0] += speed
-                speed -= 255
-                if speed <= 0:
-                    color[1] = 0
-                    color[0] = 255
-        return pg.Color(color[0], color[1], color[2], a=0.5)
+                speed -= 190
+                if speed >= 0:
+                    color[0] = 190
+                    color[1] -= speed
+                    color[1] = max(color[1], 0)
+        return pg.Color(color[0], color[1], color[2], a=0.3)
 
 
     def draw(self, objs, camera):
@@ -70,8 +71,8 @@ class Camera:
             for j in i.trail:
                 x_pos = (j[0] - self.offset[0] - self.screen.get_size()[0] / 2) * self.zoom + self.screen.get_size()[0] / 2
                 y_pos = (j[1] - self.offset[1] - self.screen.get_size()[1] / 2) * self.zoom + self.screen.get_size()[1] / 2
-                pg.draw.circle(self.screen, pg.Color(128, 128, 128, a=0.5), (x_pos, y_pos), i.radius / 3 * self.zoom * (trail_idx + 1) / self.obj.max_trail)
-                #pg.draw.circle(self.screen, self.color_from_speed(j[2]), (x_pos, y_pos), i.radius/3 * self.zoom * (trail_idx + 1)/self.obj.max_trail)
+                #pg.draw.circle(self.screen, pg.Color(128, 128, 128, a=0.5), (x_pos, y_pos), i.radius / 3 * self.zoom * (trail_idx + 1) / self.obj.max_trail)
+                pg.draw.circle(self.screen, self.color_from_speed(j[2] * 100), (x_pos, y_pos), i.radius/3 * self.zoom * (trail_idx + 1)/self.obj.max_trail)
                 trail_idx += 1
             
             # Draw object
@@ -85,8 +86,8 @@ class Camera:
         for j in camera.trail:
             x_pos = (j[0] - self.offset[0] - self.screen.get_size()[0] / 2) * self.zoom + self.screen.get_size()[0] / 2
             y_pos = (j[1] - self.offset[1] - self.screen.get_size()[1] / 2) * self.zoom + self.screen.get_size()[1] / 2
-            pg.draw.circle(self.screen, pg.Color(128, 128, 128, a=0.5), (x_pos, y_pos), camera.radius / 3 * self.zoom * (trail_idx + 1) / self.obj.max_trail)
-            #pg.draw.circle(self.screen, self.color_from_speed(j[2]), (x_pos, y_pos), i.radius/3 * self.zoom * (trail_idx + 1)/self.obj.max_trail)
+            #pg.draw.circle(self.screen, pg.Color(128, 128, 128, a=0.5), (x_pos, y_pos), camera.radius / 3 * self.zoom * (trail_idx + 1) / self.obj.max_trail)
+            pg.draw.circle(self.screen, self.color_from_speed(j[2] * 100), (x_pos, y_pos), i.radius/3 * self.zoom * (trail_idx + 1)/self.obj.max_trail)
             trail_idx += 1
         
         # Draw object
