@@ -11,7 +11,7 @@ import Body as BodyFile
 from TimeSlider import TimeSlider
 from ParticlesSlider import ParticlesSlider
 
-DT = 0.5 # Delta time for the physics engine
+DT = 0.3 # Delta time for the physics engine
 UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each frame
 
 WINDOW_WIDTH = 700
