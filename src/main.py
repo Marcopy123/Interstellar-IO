@@ -82,7 +82,7 @@ def main(render_mode: int):
     bodies = []
 
     if render_mode == 1:
-        NUM_OF_PARTICLES = 3
+        NUM_OF_PARTICLES = 1
         sun = Body(2000, np.array([WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2]), np.array([0.0, 0.0]), 0)
         moon = Body(200, np.array([WINDOW_WIDTH / 3, WINDOW_HEIGHT / 2]), np.array([0.0, 6.0]), 1)
         earth = Body(1000, np.array([WINDOW_WIDTH / 4.5, WINDOW_HEIGHT / 2]), np.array([0.0, 3.0]), 2)
