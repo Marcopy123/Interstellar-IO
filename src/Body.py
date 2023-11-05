@@ -125,7 +125,7 @@ class Body:
         elif(self.mass > 10 ** 8 and self.mass <= 10 ** 9):
             self.state = "SuperGiant"
         elif(self.mass > 10 ** 9 and self.mass <= 10 ** 10):
-            self.state = "BlackHole"
+            self.state = "BlackHoles"
         
         # choose a random image to assign if there is a phase change
         if self.state != old_state:

@@ -18,11 +18,10 @@ UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each fram
 WINDOW_WIDTH = 700
 WINDOW_HEIGHT = 700
 NUM_OF_PARTICLES = 50
-MIN_ZOOM = 0.1
+MIN_ZOOM = 0.000000000001
 MAX_ZOOM = 20
 SLIDER_LENGTH = 200
 SLIDER_HEIGHT = 5
-
 
 pg.init()
 FONT1 = pg.font.Font(None, 30)
@@ -130,7 +129,7 @@ def main(render_mode: int):
             altButton.handle_event(event)
             if event.type == pg.MOUSEWHEEL:
                 sensitivity = 0.1
-                if camera.zoom + event.y * sensitivity > MIN_ZOOM:
+                if camera.zoom + event.y * sensitivity > MIN_ZOOM or event.y > 0:
                     camera.zoom += event.y * sensitivity
             elif event.type == pg.KEYDOWN:
                 # Switch camera to next body
@@ -140,6 +139,7 @@ def main(render_mode: int):
                 camera.obj = bodies[next_body]
                     
             if pg.key.get_pressed()[pg.K_SPACE]:
+                
                 direction = np.array([pg.mouse.get_pos()[0], pg.mouse.get_pos()[1]]) - np.array([WINDOW_WIDTH/2, WINDOW_HEIGHT/2])
                 if np.linalg.norm(direction) != 0:
                     direction = direction / np.linalg.norm(direction)
@@ -195,13 +195,10 @@ def main(render_mode: int):
         timeFactor = create_text_surface("Time Factor", FONT2, WHITE)
         numParticles = create_text_surface("Number of particles", FONT2, WHITE)
 
-
-
         screen.blit(gValueText, (230, 15))
         screen.blit(timeValueText, (230, 45))
         screen.blit(numParticlesText, (230, 75))
         
-
         screen.blit(gText, (60, 25))
         screen.blit(timeFactor, (90, 55))
         screen.blit(numParticles, (70, 90))
@@ -221,7 +218,7 @@ def main(render_mode: int):
     
         numOfSolarMasses = camera.obj.mass / (195000)
 
-        currentMassText = create_text_surface("Current mass: " + str(round(numOfSolarMasses, 6)) + "sol", FONT1, WHITE)
+        currentMassText = create_text_surface("Current mass: ~" + str(round(numOfSolarMasses, 6)) + "sol", FONT1, WHITE)
         
         currentStateText = create_text_surface("You currently have the mass of: " + str(camera.obj.state), FONT1, WHITE)
         screen.blit(currentMassText, (25, 630))

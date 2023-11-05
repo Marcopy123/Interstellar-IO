@@ -40,4 +40,4 @@ class Spawner:
         # Update size
         self.size = self.newRadius(player)
 
-        return Body.Body(massOfParticle, np.array([float(randX + random.random() * 50), float(randY + random.random() * 50)]), np.array([0.0, 0.0]), uid)
+        return Body.Body(massOfParticle, np.array([float(randX + random.random() * 50), float(randY + random.random() * 50)]), np.array([random.uniform(-5, 5), random.uniform(-5, 5)]), uid)
