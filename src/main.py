@@ -37,21 +37,55 @@ def create_text_surface(text, font, color):
     text_surface = font.render(text, True, color)
     return text_surface
 
-def draw_grid(surface, grid_color, cell_size, offset):
+def do_calculation(width, height, grid_count, gravity_points, gravity_force=2000):
+    grid = []
+
+    for yi in range(grid_count):
+        row = []
+        for xi in range(grid_count):
+            x = (width / grid_count) * xi
+            y = (height / grid_count) * yi
+
+            for body in gravity_points:
+                px = body.pos[0]
+                py = body.pos[1]
+                dx = px - x
+                dy = py - y
+                d = dx**2 + dy**2
+                if d > 0:
+                    a = np.arctan2(dy, dx)
+                    f = gravity_force / d * (body.mass / 500)
+                    f = f if f < d else d
+                    x += np.cos(a) * f
+                    y += np.sin(a) * f
+
+            row.append([x, y])
+        grid.append(row)
+    return np.array(grid)
+
+def draw_grid(surface, grid_color, cell_size, offset, gravity_points):
     """
-    Draws a grid on the given surface.
+    Draws a warped grid on the given surface with respect to gravity points.
     Args:
     - surface: The Pygame surface to draw on.
     - grid_color: The color of the grid lines.
     - cell_size: The size of each cell in the grid.
+    - gravity_points: A list of tuples representing the positions of gravity points.
     """
-    width, height = surface.get_size()
-    # Draw vertical lines
-    for x in range(0, 500 * width, cell_size):
-        pg.draw.line(surface, grid_color, (x - offset[0], 0), (x - offset[0], height))
-    # Draw horizontal lines
-    for y in range(0, 500 * height, cell_size):
-        pg.draw.line(surface, grid_color, (0, y - offset[1]), (width, y - offset[1]))
+    width, height = 1000,1000
+    grid_count = max(width, height) // cell_size  # Number of cells in the largest dimension
+    warped_grid = do_calculation(width, height, grid_count, gravity_points)
+
+    # Draw the warped grid lines
+    for yi in range(grid_count):
+        for xi in range(grid_count - 1):
+            start_pos = warped_grid[yi, xi] - np.array(offset)
+            end_pos = warped_grid[yi, xi + 1] - np.array(offset)
+            pg.draw.line(surface, grid_color, start_pos, end_pos)
+
+            start_pos = warped_grid[xi, yi] - np.array(offset)
+            end_pos = warped_grid[xi + 1, yi] - np.array(offset)
+            pg.draw.line(surface, grid_color, start_pos, end_pos)
 
 # Usage example within your game loop:
 # Define your grid color and cell size
@@ -129,7 +163,7 @@ def main(render_mode: int):
 
                 camera.obj.add_force(direction, dforce)
             
-        draw_grid(screen, grid_color, cell_size, camera.offset)
+        draw_grid(screen, grid_color, cell_size, camera.offset, bodies)
         gravitySlider.draw(screen)
         timeSlider.draw(screen)
         particlesSlider.draw(screen)
@@ -197,6 +231,7 @@ def main(render_mode: int):
         screen.blit(currentMassText, (25, 630))
         screen.blit(currentStateText, (25, 660))
         print(camera.obj.state)
+        
         pg.display.flip()
         clock.tick(60)
     
