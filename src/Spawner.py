@@ -16,7 +16,15 @@ class Spawner:
     def spawnParticle(self, player: Body, uid: int) -> Body:
         # spawn a particle within the size, random mass, random x y pos within radius, initial velocity of 0
         # make sure the particle is smaller than the player body mass
-        massOfParticle = random.randint(int(player.mass/30) , int(player.mass/10))
+
+        massAlgorithm = random.random()
+        if massAlgorithm < 0.1:
+            massOfParticle = random.randint(int(player.mass/20), int(player.mass/10))
+        elif massAlgorithm < 0.15:
+            massOfParticle = random.randint(int(player.mass/30), int(player.mass/10))
+        else:
+            massOfParticle = random.randint(10, int(6 * math.sqrt(player.mass)))
+
         minX = int(player.pos[0] - self.size)
         maxX = int(player.pos[0] + self.size)
         randX = random.randint(minX + 1, maxX - 1)
