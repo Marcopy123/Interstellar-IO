@@ -80,16 +80,25 @@ def main(render_mode: int):
 
     bodies = []
 
-    first_player = Body(100, np.array([WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2]), np.array([0.0, 0.0]), 0)
-    next_player_uid = 1
-
-    bodies.append(first_player)
+    if render_mode == 1:
+        NUM_OF_PARTICLES = 1
+        sun = Body(2000, np.array([WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2]), np.array([0.0, 0.0]), 0)
+        moon = Body(200, np.array([WINDOW_WIDTH / 3, WINDOW_HEIGHT / 2]), np.array([0.0, 6.0]), 1)
+        earth = Body(1000, np.array([WINDOW_WIDTH / 4.5, WINDOW_HEIGHT / 2]), np.array([0.0, 3.0]), 2)
+        bodies.append(sun)
+        bodies.append(earth)
+        bodies.append(moon)
+        next_player_uid = 3
+    else:
+        first_player = Body(100, np.array([WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2]), np.array([0.0, 0.0]), 0)
+        next_player_uid = 1
+        bodies.append(first_player)
     
     clock = pg.time.Clock()
     camera = Camera(bodies[0], screen)
     targetZoom = camera.calculate_zoom_based_on_mass()
     spawner = Spawner(bodies[0])
-    
+
     
     running = True
     # pygame main loop
@@ -178,12 +187,17 @@ def main(render_mode: int):
             next_player_uid += 1
         set_gravitational_constant(gravitySlider.get_value())
         DT = timeSlider.get_value()
-        NUM_OF_PARTICLES = int(particlesSlider.get_value())
+        if render_mode != 1:
+            NUM_OF_PARTICLES = int(particlesSlider.get_value())
         
         camera.update(targetZoom)
         camera.draw(bodies)
-        currentMassText = create_text_surface("Current mass: " + str(camera.obj.mass) + "kg", FONT1, BLACK)
-        currentStateText = create_text_surface("You currently have the mass of: " + str(camera.obj.state), FONT1, BLACK)
+    
+        numOfSolarMasses = camera.obj.mass / (195000)
+
+        currentMassText = create_text_surface("Current mass: " + str(round(numOfSolarMasses, 6)) + "sol", FONT1, BLACK)
+        
+        currentStateText = create_text_surface("You currently have the mass of:" + str(camera.obj.state), FONT1, BLACK)
         screen.blit(currentMassText, (25, 630))
         screen.blit(currentStateText, (25, 660))
         print(camera.obj.state)
