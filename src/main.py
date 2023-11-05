@@ -1,6 +1,7 @@
 import math 
 import numpy as np
 import pygame as pg
+from sys import argv
 from Body import Body
 import random
 from Camera import Camera
@@ -66,7 +67,7 @@ def set_gravitational_constant(value):
     global G
     BodyFile.G = value
 
-def main():
+def main(render_mode: int):
     global DT
     global NUM_OF_PARTICLES
     print("interstellarIO")
@@ -144,8 +145,8 @@ def main():
                             if b.uid == m[1]:
                                 camera.obj = b
                                 ntargetZoom = camera.calculate_zoom_based_on_mass()
-                                if ntargetZoom != targetZoom:
-                                    print("a")
+                                #if ntargetZoom != targetZoom:
+                                    #print("a")
                                 break
 
                 body_count -= len(merges)
@@ -193,4 +194,10 @@ def main():
     pg.quit()
 
 if __name__ == "__main__":
-    main()
+    render_mode = 0
+    if len(argv) == 2:
+        if argv[1] == "solar":
+            render_mode = 1
+        else:
+            print("Unknown argument")
+    main(render_mode)
