@@ -88,6 +88,7 @@ class Body:
                 big.mass += small.mass
                 big.target_radius = int(5 * math.sqrt(big.mass / DENSITY)) / 5
                 bodies.remove(small)
+                
                 big.update_form()
 
                 merges.append([small.uid, big.uid])
