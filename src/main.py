@@ -10,7 +10,8 @@ from GravitySlider import GravitySlider
 import Body as BodyFile
 from TimeSlider import TimeSlider
 from ParticlesSlider import ParticlesSlider
-from Button import Button
+from SpaceTimeButton import SpaceTimeButton
+from AltButton import AltButton
 
 DT = 0.3 # Delta time for the physics engine
 UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each frame
@@ -35,20 +36,11 @@ ALT_REND = False
 CURVE_SPACETIME = False
 SPAWN_SEED = -1
 
-def toggleAltRendering():
-    global ALT_REND
-    ALT_REND = not ALT_REND
 
-def toggleSpacetime():
-    global CURVE_SPACETIME
-    CURVE_SPACETIME = not CURVE_SPACETIME
 
 gravitySlider = GravitySlider(20, 20, SLIDER_LENGTH, SLIDER_HEIGHT, 0.1, 20, BodyFile.G)
 timeSlider = TimeSlider(20, 50, SLIDER_LENGTH, SLIDER_HEIGHT, 0.01, 3, DT)
 particlesSlider = ParticlesSlider(20, 80, SLIDER_LENGTH, SLIDER_HEIGHT, 1, 100, NUM_OF_PARTICLES)
-
-altButton = Button(300, 20, 50, 20, toggleAltRendering)
-spacetimeButton = Button(300, 50, 50, 20, toggleSpacetime)
 
 def create_text_surface(text, font, color):
     text_surface = font.render(text, True, color)
@@ -136,7 +128,8 @@ def main(render_mode: int):
 
     pg.init()
     
-
+    AltRenderingButton = AltButton(585, 20, 40, 20)
+    SpaceTimeButtonRender = SpaceTimeButton(585, 50, 40, 20)
     pg.display.set_caption("Interstellar IO")
 
     screen = pg.display.set_mode(window_size)
@@ -174,13 +167,21 @@ def main(render_mode: int):
     while running:
         screen.fill((0,0,42))
         for event in pg.event.get():
+            pos = pg.mouse.get_pos()
             if event.type == pg.QUIT:
                 running = False
             gravitySlider.handle_event(event)
             timeSlider.handle_event(event)
             particlesSlider.handle_event(event)
-            altButton.handle_event(event)
-            spacetimeButton.handle_event(event)
+            # altButton.handle_event(event)
+            # spacetimeButton.handle_event(event)
+
+            if event.type == pg.MOUSEBUTTONDOWN:
+                AltRenderingButton.toggle(pos)
+                SpaceTimeButtonRender.toggle(pos)
+                ALT_REND = AltRenderingButton.on
+                CURVE_SPACETIME = SpaceTimeButtonRender.on
+
             if event.type == pg.MOUSEWHEEL:
                 sensitivity = 0.1
                 if camera.zoom + event.y * sensitivity > MIN_ZOOM or event.y > 0:
@@ -239,8 +240,8 @@ def main(render_mode: int):
         gValueText = create_text_surface(str(round(BodyFile.G, 2)), FONT1, WHITE)
         timeValueText = create_text_surface(str(round(DT, 2)), FONT1, WHITE)
         numParticlesText = create_text_surface(str(NUM_OF_PARTICLES), FONT1, WHITE)
-        altButtonText = create_text_surface(f"Alternate simulation: {ALT_REND}", FONT1, WHITE)
-        spacetimeText = create_text_surface(f"Visualize spacetime: {CURVE_SPACETIME}", FONT1, WHITE)
+        altButtonText = create_text_surface(f"Alternate simulation", FONT1, WHITE)
+        spacetimeText = create_text_surface(f"Visualize spacetime", FONT1, WHITE)
 
         gText = create_text_surface("Gravitational Constant", FONT2, WHITE)
         timeFactor = create_text_surface("Time Factor", FONT2, WHITE)
@@ -277,8 +278,10 @@ def main(render_mode: int):
         gravitySlider.draw(screen)
         timeSlider.draw(screen)
         particlesSlider.draw(screen)
-        altButton.draw(screen, WHITE, GREEN)
-        spacetimeButton.draw(screen, WHITE, GREEN)
+        # altButton.draw(screen, WHITE, GREEN)
+        # spacetimeButton.draw(screen, WHITE, GREEN)
+        SpaceTimeButtonRender.draw(screen)
+        AltRenderingButton.draw(screen)
         pg.display.flip()
         clock.tick(60)
     
