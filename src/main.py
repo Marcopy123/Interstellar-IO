@@ -110,6 +110,12 @@ def main(render_mode: int):
     targetZoom = camera.calculate_zoom_based_on_mass()
     spawner = Spawner(bodies[0])
 
+    if render_mode == 0:
+        # First round of spawning is anywhere around the player, not at the edge of the spawn circle
+        for i in range(NUM_OF_PARTICLES - 1):
+            bodies.append(spawner.spawnParticle(bodies[0], next_player_uid, True))
+            next_player_uid += 1
+
     
     running = True
     # pygame main loop
@@ -124,9 +130,14 @@ def main(render_mode: int):
             altButton.handle_event(event)
             if event.type == pg.MOUSEWHEEL:
                 sensitivity = 0.1
-                if camera.zoom + event.y * sensitivity > MIN_ZOOM: 
-                    print(camera.zoom)
+                if camera.zoom + event.y * sensitivity > MIN_ZOOM:
                     camera.zoom += event.y * sensitivity
+            elif event.type == pg.KEYDOWN:
+                # Switch camera to next body
+                next_body = bodies.index(camera.obj) + 1
+                if next_body >= len(bodies):
+                    next_body = 0
+                camera.obj = bodies[next_body]
                     
             if pg.key.get_pressed()[pg.K_SPACE]:
                 direction = np.array([pg.mouse.get_pos()[0], pg.mouse.get_pos()[1]]) - np.array([WINDOW_WIDTH/2, WINDOW_HEIGHT/2])
@@ -198,7 +209,7 @@ def main(render_mode: int):
 
         n_particles = len(bodies)
         for i in range(NUM_OF_PARTICLES - n_particles):
-            bodies.append(spawner.spawnParticle(camera.obj, next_player_uid))
+            bodies.append(spawner.spawnParticle(camera.obj, next_player_uid, False))
             next_player_uid += 1
         set_gravitational_constant(gravitySlider.get_value())
         DT = timeSlider.get_value()

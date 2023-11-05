@@ -122,7 +122,7 @@ class Body:
         elif(self.mass > 10 ** 7 and self.mass <= 10 ** 8):
             self.state = "RedGiant"
         elif(self.mass > 10 ** 8 and self.mass <= 10 ** 9):
-            self.state = "Supergiant"
+            self.state = "SuperGiant"
         elif(self.mass > 10 ** 9 and self.mass <= 10 ** 10):
             self.state = "BlackHole"
         
