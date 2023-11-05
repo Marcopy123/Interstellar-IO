@@ -199,8 +199,8 @@ def main(render_mode: int):
                     direction = direction / np.linalg.norm(direction)
                 else:
                     direction = np.array([0.0, 0.0])
-                ejectedMass = camera.obj.mass / 250
-                relMassVelocity = 4 * math.sqrt(camera.obj.mass)
+                ejectedMass = camera.obj.mass / 500
+                relMassVelocity = 6 * math.sqrt(camera.obj.mass)
                 camera.obj.mass -= ejectedMass
                 dforce = camera.obj.mass * ejectedMass * relMassVelocity
                 dforce /= (DT * (1 - ejectedMass))
@@ -254,7 +254,7 @@ def main(render_mode: int):
             NUM_OF_PARTICLES = int(particlesSlider.get_value())
         
         camera.update(targetZoom)
-        camera.draw(bodies)
+        camera.draw(bodies, camera.obj)
     
         numOfSolarMasses = camera.obj.mass / (195000)
 
