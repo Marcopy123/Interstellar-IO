@@ -17,7 +17,7 @@ UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each fram
 WINDOW_WIDTH = 700
 WINDOW_HEIGHT = 700
 NUM_OF_PARTICLES = 50
-MIN_ZOOM = 0.1
+MIN_ZOOM = 0.000000000001
 MAX_ZOOM = 20
 SLIDER_LENGTH = 200
 SLIDER_HEIGHT = 5
@@ -112,11 +112,12 @@ def main(render_mode: int):
             particlesSlider.handle_event(event)
             if event.type == pg.MOUSEWHEEL:
                 sensitivity = 0.1
-                if camera.zoom + event.y * sensitivity > MIN_ZOOM: 
-                    print(camera.zoom)
+                print(event.y)
+                if camera.zoom + event.y * sensitivity > MIN_ZOOM or event.y > 0:
                     camera.zoom += event.y * sensitivity
-                    
+                    print(camera.zoom)
             if pg.key.get_pressed()[pg.K_SPACE]:
+                
                 direction = np.array([pg.mouse.get_pos()[0], pg.mouse.get_pos()[1]]) - np.array([WINDOW_WIDTH/2, WINDOW_HEIGHT/2])
                 if np.linalg.norm(direction) != 0:
                     direction = direction / np.linalg.norm(direction)
@@ -200,7 +201,6 @@ def main(render_mode: int):
         currentStateText = create_text_surface("You currently have the mass of: " + str(camera.obj.state), FONT1, WHITE)
         screen.blit(currentMassText, (25, 630))
         screen.blit(currentStateText, (25, 660))
-        print(camera.obj.state)
         pg.display.flip()
         clock.tick(60)
     
