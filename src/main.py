@@ -154,13 +154,21 @@ def main():
         timeValueText = create_text_surface(str(round(DT, 2)), FONT1, BLACK)
         numParticlesText = create_text_surface(str(NUM_OF_PARTICLES), FONT1, BLACK)
 
+        currentMassText = create_text_surface("Current mass: " + str(camera.obj.mass) + "kg", FONT1, BLACK)
+        currentStateText = create_text_surface("You currently have the mass of: " + str(camera.obj.state), FONT1, BLACK)
+
         gText = create_text_surface("Gravitational Constant", FONT2, BLACK)
         timeFactor = create_text_surface("Time Factor", FONT2, BLACK)
         numParticles = create_text_surface("Number of particles", FONT2, BLACK)
 
+
+
         screen.blit(gValueText, (230, 15))
         screen.blit(timeValueText, (230, 45))
         screen.blit(numParticlesText, (230, 75))
+
+        screen.blit(currentMassText, (25, 630))
+        screen.blit(currentStateText, (25, 660))
 
         screen.blit(gText, (60, 25))
         screen.blit(timeFactor, (90, 55))

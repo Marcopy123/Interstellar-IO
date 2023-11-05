@@ -21,6 +21,7 @@ class Body:
         self.id = 0
         
         self.state = ""
+        self.update_form()
         
     # Returns vector for gravitational pull of other Body acting on this Body
     def gravitational_force_from_other(self, other):
