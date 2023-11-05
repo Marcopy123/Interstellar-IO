@@ -10,6 +10,7 @@ from GravitySlider import GravitySlider
 import Body as BodyFile
 from TimeSlider import TimeSlider
 from ParticlesSlider import ParticlesSlider
+from Button import Button
 
 DT = 0.3 # Delta time for the physics engine
 UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each frame
@@ -28,30 +29,90 @@ FONT2 = pg.font.Font(None, 20)
 
 BLACK = (0,0,0)
 WHITE = (255,255,255)
+GREEN = (60, 250, 60)
 
-gravitySlider = GravitySlider(20, 20, SLIDER_LENGTH, SLIDER_HEIGHT, 1, 20, BodyFile.G)
+ALT_REND = False
+CURVE_SPACETIME = False
+SPAWN_SEED = -1
+
+def toggleAltRendering():
+    global ALT_REND
+    ALT_REND = not ALT_REND
+
+def toggleSpacetime():
+    global CURVE_SPACETIME
+    CURVE_SPACETIME = not CURVE_SPACETIME
+
+gravitySlider = GravitySlider(20, 20, SLIDER_LENGTH, SLIDER_HEIGHT, 0.1, 20, BodyFile.G)
 timeSlider = TimeSlider(20, 50, SLIDER_LENGTH, SLIDER_HEIGHT, 0.01, 3, DT)
 particlesSlider = ParticlesSlider(20, 80, SLIDER_LENGTH, SLIDER_HEIGHT, 1, 100, NUM_OF_PARTICLES)
+
+altButton = Button(300, 20, 50, 20, toggleAltRendering)
+spacetimeButton = Button(300, 50, 50, 20, toggleSpacetime)
 
 def create_text_surface(text, font, color):
     text_surface = font.render(text, True, color)
     return text_surface
 
-def draw_grid(surface, grid_color, cell_size, offset):
+def do_calculation(width, height, grid_count, gravity_points, curve_spacetime: bool, curve_all: bool, gravity_force=2000):
+    grid = []
+
+    for yi in range(grid_count):
+        row = []
+        for xi in range(grid_count):
+            x = (width / grid_count) * xi
+            y = (height / grid_count) * yi
+
+            if not curve_spacetime:
+                row.append([x, y])
+                continue
+
+            for body in gravity_points:
+                if body.mass < 1000 and not curve_all:
+                    continue
+                px = body.pos[0]
+                py = body.pos[1]
+                dx = px - x
+                dy = py - y
+                d = dx**2 + dy**2
+                if d < body.radius:
+                    continue
+                if d > 0:
+                    a = np.arctan2(dy, dx)
+                    f = gravity_force / d * math.sqrt(body.mass / 1000)
+                    f = f if f < d else d
+                    f = min(f, 8)
+                    x += np.cos(a) * f
+                    y += np.sin(a) * f
+
+            row.append([x, y])
+        grid.append(row)
+    return np.array(grid)
+
+def draw_grid(surface, grid_color, cell_size, offset, gravity_points, curve_spacetime: bool, curve_all: bool):
     """
-    Draws a grid on the given surface.
+    Draws a warped grid on the given surface with respect to gravity points.
     Args:
     - surface: The Pygame surface to draw on.
     - grid_color: The color of the grid lines.
     - cell_size: The size of each cell in the grid.
+    - gravity_points: A list of tuples representing the positions of gravity points.
     """
-    width, height = surface.get_size()
-    # Draw vertical lines
-    for x in range(0, 500 * width, cell_size):
-        pg.draw.line(surface, grid_color, (x - offset[0], 0), (x - offset[0], height))
-    # Draw horizontal lines
-    for y in range(0, 500 * height, cell_size):
-        pg.draw.line(surface, grid_color, (0, y - offset[1]), (width, y - offset[1]))
+    width, height = 1000,1000
+    grid_count = max(width, height) // cell_size  # Number of cells in the largest dimension
+
+    warped_grid = do_calculation(width, height, grid_count, gravity_points, curve_spacetime, curve_all)
+
+    # Draw the warped grid lines
+    for yi in range(grid_count):
+        for xi in range(grid_count - 1):
+            start_pos = warped_grid[yi, xi] - np.array(offset)
+            end_pos = warped_grid[yi, xi + 1] - np.array(offset)
+            pg.draw.line(surface, grid_color, start_pos, end_pos)
+
+            start_pos = warped_grid[xi, yi] - np.array(offset)
+            end_pos = warped_grid[xi + 1, yi] - np.array(offset)
+            pg.draw.line(surface, grid_color, start_pos, end_pos)
 
 # Usage example within your game loop:
 # Define your grid color and cell size
@@ -68,6 +129,9 @@ def set_gravitational_constant(value):
 def main(render_mode: int):
     global DT
     global NUM_OF_PARTICLES
+    global ALT_REND
+    global SPAWN_SEED
+    global CURVE_SPACETIME
     print("interstellarIO")
 
     pg.init()
@@ -96,25 +160,38 @@ def main(render_mode: int):
     clock = pg.time.Clock()
     camera = Camera(bodies[0], screen)
     targetZoom = camera.calculate_zoom_based_on_mass()
-    spawner = Spawner(bodies[0])
+    spawner = Spawner(bodies[0], SPAWN_SEED)
+
+    if render_mode == 0:
+        # First round of spawning is anywhere around the player, not at the edge of the spawn circle
+        for i in range(NUM_OF_PARTICLES - 1):
+            bodies.append(spawner.spawnParticle(bodies[0], next_player_uid, True))
+            next_player_uid += 1
 
     
     running = True
     # pygame main loop
     while running:
-        screen.fill((0,0,0))
+        screen.fill((0,0,42))
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running = False
             gravitySlider.handle_event(event)
             timeSlider.handle_event(event)
             particlesSlider.handle_event(event)
+            altButton.handle_event(event)
+            spacetimeButton.handle_event(event)
             if event.type == pg.MOUSEWHEEL:
                 sensitivity = 0.1
-                print(event.y)
                 if camera.zoom + event.y * sensitivity > MIN_ZOOM or event.y > 0:
                     camera.zoom += event.y * sensitivity
-                    print(camera.zoom)
+            elif event.type == pg.KEYDOWN and render_mode == 1:
+                # Switch camera to next body
+                next_body = bodies.index(camera.obj) + 1
+                if next_body >= len(bodies):
+                    next_body = 0
+                camera.obj = bodies[next_body]
+                    
             if pg.key.get_pressed()[pg.K_SPACE]:
                 
                 direction = np.array([pg.mouse.get_pos()[0], pg.mouse.get_pos()[1]]) - np.array([WINDOW_WIDTH/2, WINDOW_HEIGHT/2])
@@ -130,17 +207,19 @@ def main(render_mode: int):
 
                 camera.obj.add_force(direction, dforce)
             
-        draw_grid(screen, grid_color, cell_size, camera.offset)
+        draw_grid(screen, grid_color, cell_size, camera.offset, bodies, CURVE_SPACETIME, (render_mode == 1))
         gravitySlider.draw(screen)
         timeSlider.draw(screen)
         particlesSlider.draw(screen)
+        altButton.draw(screen, WHITE, GREEN)
+        spacetimeButton.draw(screen, WHITE, GREEN)
 
         for i in range(UPDATES_PER_FRAME):
             for j in bodies:
                  current = 0
             body_count = len(bodies)
             while current < body_count:
-                merges = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1, (bodies[current].uid == camera.obj.uid), spawner.newRadius(camera.obj))
+                merges = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1, (bodies[current].uid == camera.obj.uid), spawner.newRadius(camera.obj), ALT_REND)
                 for m in merges:
 
                     if m[0] == -1:
@@ -163,6 +242,8 @@ def main(render_mode: int):
         gValueText = create_text_surface(str(round(BodyFile.G, 2)), FONT1, WHITE)
         timeValueText = create_text_surface(str(round(DT, 2)), FONT1, WHITE)
         numParticlesText = create_text_surface(str(NUM_OF_PARTICLES), FONT1, WHITE)
+        altButtonText = create_text_surface(f"Alternate simulation: {ALT_REND}", FONT1, WHITE)
+        spacetimeText = create_text_surface(f"Visualize spacetime: {CURVE_SPACETIME}", FONT1, WHITE)
 
         
 
@@ -177,10 +258,12 @@ def main(render_mode: int):
         screen.blit(gText, (60, 25))
         screen.blit(timeFactor, (90, 55))
         screen.blit(numParticles, (70, 90))
+        screen.blit(altButtonText, (370, 20))
+        screen.blit(spacetimeText, (370, 50))
 
         n_particles = len(bodies)
         for i in range(NUM_OF_PARTICLES - n_particles):
-            bodies.append(spawner.spawnParticle(camera.obj, next_player_uid))
+            bodies.append(spawner.spawnParticle(camera.obj, next_player_uid, False))
             next_player_uid += 1
         set_gravitational_constant(gravitySlider.get_value())
         DT = timeSlider.get_value()
@@ -207,6 +290,9 @@ if __name__ == "__main__":
     if len(argv) == 2:
         if argv[1] == "solar":
             render_mode = 1
+        elif argv[1].isdigit():
+            SPAWN_SEED = int(argv[1])
+
         else:
             print("Unknown argument")
     main(render_mode)
