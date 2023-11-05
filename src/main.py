@@ -32,12 +32,13 @@ WHITE = (255,255,255)
 GREEN = (60, 250, 60)
 
 ALT_REND = False
+SPAWN_SEED = -1
 
 def toggleAltRendering():
     global ALT_REND
     ALT_REND = not ALT_REND
 
-gravitySlider = GravitySlider(20, 20, SLIDER_LENGTH, SLIDER_HEIGHT, 1, 20, BodyFile.G)
+gravitySlider = GravitySlider(20, 20, SLIDER_LENGTH, SLIDER_HEIGHT, 0.1, 20, BodyFile.G)
 timeSlider = TimeSlider(20, 50, SLIDER_LENGTH, SLIDER_HEIGHT, 0.01, 3, DT)
 particlesSlider = ParticlesSlider(20, 80, SLIDER_LENGTH, SLIDER_HEIGHT, 1, 100, NUM_OF_PARTICLES)
 
@@ -79,6 +80,7 @@ def main(render_mode: int):
     global DT
     global NUM_OF_PARTICLES
     global ALT_REND
+    global SPAWN_SEED
     print("interstellarIO")
 
     pg.init()
@@ -107,7 +109,7 @@ def main(render_mode: int):
     clock = pg.time.Clock()
     camera = Camera(bodies[0], screen)
     targetZoom = camera.calculate_zoom_based_on_mass()
-    spawner = Spawner(bodies[0])
+    spawner = Spawner(bodies[0], SPAWN_SEED)
 
     if render_mode == 0:
         # First round of spawning is anywhere around the player, not at the edge of the spawn circle
@@ -119,7 +121,7 @@ def main(render_mode: int):
     running = True
     # pygame main loop
     while running:
-        screen.fill((0,0,0))
+        screen.fill((0,0,42))
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running = False
@@ -131,7 +133,7 @@ def main(render_mode: int):
                 sensitivity = 0.1
                 if camera.zoom + event.y * sensitivity > MIN_ZOOM or event.y > 0:
                     camera.zoom += event.y * sensitivity
-            elif event.type == pg.KEYDOWN:
+            elif event.type == pg.KEYDOWN and render_mode == 1:
                 # Switch camera to next body
                 next_body = bodies.index(camera.obj) + 1
                 if next_body >= len(bodies):
@@ -233,6 +235,9 @@ if __name__ == "__main__":
     if len(argv) == 2:
         if argv[1] == "solar":
             render_mode = 1
+        elif argv[1].isdigit():
+            SPAWN_SEED = int(argv[1])
+
         else:
             print("Unknown argument")
     main(render_mode)

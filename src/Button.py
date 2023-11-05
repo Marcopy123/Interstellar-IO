@@ -16,7 +16,7 @@ class Button:
     def handle_event(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
             mouseX, mouseY = event.pos
-            if self.x < mouseX and mouseX < self.x + self.w:# and self.y < mouseY and mouseY < self.y + self.h and self.isPressed == False:
+            if self.x < mouseX and mouseX < self.x + self.w and self.y < mouseY and mouseY < self.y + self.h and self.isPressed == False:
                 self.isPressed = True
                 self.onClick()
         elif event.type == pg.MOUSEBUTTONUP:
