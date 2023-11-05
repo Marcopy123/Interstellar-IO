@@ -11,6 +11,7 @@ class Spawner:
         self.currentParticles = 0
         if spawn_seed < 0:
             seed = int(time.time())
+            print(f"seed: {seed}")
             random.seed(seed)
         else:
             random.seed(spawn_seed)

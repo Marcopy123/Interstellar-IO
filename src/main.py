@@ -69,7 +69,6 @@ def do_calculation(width, height, grid_count, gravity_points, curve_spacetime: b
 
             for body in gravity_points:
                 if body.mass < 1000 and not curve_all:
-                    print('skipped')
                     continue
                 px = body.pos[0]
                 py = body.pos[1]
@@ -82,7 +81,7 @@ def do_calculation(width, height, grid_count, gravity_points, curve_spacetime: b
                     a = np.arctan2(dy, dx)
                     f = gravity_force / d * math.sqrt(body.mass / 1000)
                     f = f if f < d else d
-                    f = min(f, 6)
+                    f = min(f, 8)
                     x += np.cos(a) * f
                     y += np.sin(a) * f
 
