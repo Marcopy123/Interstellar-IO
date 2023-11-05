@@ -125,7 +125,7 @@ def main():
                  current = 0
             body_count = len(bodies)
             while current < body_count:
-                merges = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1)
+                merges = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1, (bodies[current].uid == camera.obj.uid), spawner.newRadius(camera.obj))
                 for m in merges:
 
                     if m[0] == -1:

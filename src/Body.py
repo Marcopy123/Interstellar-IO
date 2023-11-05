@@ -3,6 +3,7 @@ import math
 
 G = 1 # Gravitational constant
 DENSITY = 25 # Units of mass per unit of area
+DESPAWN_RADIUS = 350
 
 class Body:
     def __init__(self, mass: float, pos: np.ndarray[np.float64], vel: np.ndarray[np.float64], uid: int) -> None:
@@ -12,6 +13,11 @@ class Body:
         self.uid = uid
         self.radius = math.sqrt(mass / DENSITY)
         self.net_force = np.array([0.0, 0.0])
+        
+        self.trail = []
+        self.max_trail = 30
+        self.trail_density = 0.25
+        self.id = 0
         
     # Returns vector for gravitational pull of other Body acting on this Body
     def gravitational_force_from_other(self, other):
@@ -28,14 +34,30 @@ class Body:
     # If n is 0, no merges were done (no bodies)
     # Otherwise, the size of n is the number of merges that were made, i.e. the number of bodies deleted
     # Additionally, if n is negative, the self object has been merged AND deleted
-    def update(self, dt: float, bodies: [], start: int):
+    def update(self, dt: float, bodies: [], start: int, check_despawn: bool, spawn_radius: float):
+        if self.id % (1 / self.trail_density) == 0:
+            if len(self.trail) < self.max_trail:
+                self.trail.append(self.pos.copy())
+            else:
+                self.trail = self.trail[1:]
+                self.trail.append(self.pos.copy())
+                
+        self.id += 1
+        
         merges = []
         current = start
         body_count = len(bodies)
         while current < body_count:
             # TODO maybe reuse calculated second.pos - first.pos with gravitational_force
             other = bodies[current]
-            force = self.gravitational_force_from_other(other)
+            result = self.gravitational_force_from_other(other)
+            if check_despawn and len(result) > 1:
+                if result[1] > DESPAWN_RADIUS + spawn_radius:
+                    merges.append([current, -2])
+                    bodies.pop(current)
+                    body_count -= 1
+                    continue
+            force = result[0]
             if force.size == 1:
                 # Merge
                 big = max(self, other, key=lambda x: x.radius)
