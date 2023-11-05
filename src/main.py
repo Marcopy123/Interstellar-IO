@@ -56,12 +56,11 @@ def draw_grid(surface, grid_color, cell_size, offset):
 
 # Usage example within your game loop:
 # Define your grid color and cell size
-grid_color = (200, 200, 200)  # Light grey color for the grid lines
+grid_color = (150, 150, 150)  # Light grey color for the grid lines
 cell_size = 40  # Adjust the cell size as per your requirement
 window_size = (WINDOW_WIDTH, WINDOW_HEIGHT)
 screen = pg.display.set_mode(window_size)
 # In your main game loop, before drawing anything else:
-screen.fill((0, 0, 0))  # Fill the screen with black or your desired background color
 
 def set_gravitational_constant(value):
     global G
@@ -95,7 +94,7 @@ def main(render_mode: int):
     running = True
     # pygame main loop
     while running:
-        screen.fill((255, 255, 255))
+        screen.fill((4,12,36))
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running = False
