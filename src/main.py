@@ -30,7 +30,7 @@ BLACK = (0,0,0)
 WHITE = (255,255,255)
 
 gravitySlider = GravitySlider(20, 20, SLIDER_LENGTH, SLIDER_HEIGHT, 1, 20, BodyFile.G)
-timeSlider = TimeSlider(20, 50, SLIDER_LENGTH, SLIDER_HEIGHT, 0.05, 3, DT)
+timeSlider = TimeSlider(20, 50, SLIDER_LENGTH, SLIDER_HEIGHT, 0.01, 3, DT)
 particlesSlider = ParticlesSlider(20, 80, SLIDER_LENGTH, SLIDER_HEIGHT, 1, 100, NUM_OF_PARTICLES)
 
 def create_text_surface(text, font, color):
