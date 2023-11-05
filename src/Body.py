@@ -21,7 +21,7 @@ class Body:
         self.max_trail = 15
         self.trail_density = 0.50
         self.id = 0
-        self.trail_thick = 1
+        self.trail_thick = 0.33
         
         self.state = ""
         self.image = None
