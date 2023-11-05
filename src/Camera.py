@@ -1,7 +1,6 @@
 import numpy as np
 import pygame as pg
 import math
-from main import draw_fading_circle
 
 WINDOW_WIDTH = 700
 WINDOW_HEIGHT = 700
@@ -18,6 +17,9 @@ class Camera:
         self.zoom = 4.000000000001
         self.offset = np.array([0.0, 0.0])
         self.sensitivity = 0.1
+        self.fade_circle = False
+        self.circle_duration = 0
+        self.current_duration = 0
 
     def calculate_zoom_based_on_mass(self):
         # Example calculation, needs tuning to fit the game's feel and scale
@@ -41,6 +43,17 @@ class Camera:
             objs (list): list of objects
         """
 
+    def draw_fading_circle(self, surface, pos, max_radius, duration, elapsed):
+        center = (pos[0], pos[1])
+
+        # A single frame
+        alpha = max(0, 200 - (200 * (elapsed / duration)))
+        radius = int(max_radius * (elapsed / duration))
+
+        # Create a new surface with per-pixel alpha to draw the circle with alpha transparency
+        pg.draw.circle(surface, (255, 255, 255, int(alpha)), center, radius)
+
+
     def color_from_speed(self, speed):
         # the most cursed thing you'll ever see
         # TODO work in progress
@@ -63,7 +76,7 @@ class Camera:
         return pg.Color(color[0], color[1], color[2], a=0.3)
 
 
-    def draw(self, objs, camera):
+    def draw(self, objs, camera, fade_circle_surface):
         for i in objs:
             # Draw trail
             if i.uid == camera.uid:
@@ -96,3 +109,17 @@ class Camera:
         y_pos = (camera.pos[1] - self.offset[1] - self.screen.get_size()[1] / 2) * self.zoom + self.screen.get_size()[1] / 2
         img = pg.transform.scale(camera.image, (camera.radius * self.zoom * 3, camera.radius * self.zoom * 3))
         self.screen.blit(img, (x_pos - camera.radius * self.zoom * 3/2 , y_pos - camera.radius * self.zoom * 3/2))
+
+        if self.fade_circle:
+            self.circle_duration = 100
+            self.current_duration = 0
+            self.fade_circle = False
+        
+        if self.current_duration < self.circle_duration:
+            circle_x_pos = self.screen.get_size()[0] / 2
+            circle_y_pos = self.screen.get_size()[1] / 2
+            self.draw_fading_circle(fade_circle_surface, [circle_x_pos, circle_y_pos], self.screen.get_size()[0], self.circle_duration, self.current_duration)
+            self.current_duration += 1
+            if self.current_duration >= self.circle_duration:
+                self.current_duration = 0
+                self.circle_duration = 0
