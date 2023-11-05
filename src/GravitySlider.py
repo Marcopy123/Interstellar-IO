@@ -10,7 +10,7 @@ class GravitySlider():
         self.min_val = min_val
         self.max_val = max_val
         self.val = start_val
-        self.handle_rect = pygame.Rect(x, y - (HANDLE_RADIUS - h//2), HANDLE_RADIUS*2, HANDLE_RADIUS*2)
+        self.handle_rect = pygame.Rect(x, y - (HANDLE_RADIUS - h/2), HANDLE_RADIUS*2, HANDLE_RADIUS*2)
         self.active = False
 
     def handle_event(self, event):

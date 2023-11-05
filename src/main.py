@@ -10,6 +10,7 @@ from GravitySlider import GravitySlider
 import Body as BodyFile
 from TimeSlider import TimeSlider
 from ParticlesSlider import ParticlesSlider
+from Button import Button
 
 DT = 0.3 # Delta time for the physics engine
 UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each frame
@@ -29,10 +30,19 @@ FONT2 = pg.font.Font(None, 20)
 
 BLACK = (0,0,0)
 WHITE = (255,255,255)
+GREEN = (60, 250, 60)
+
+ALT_REND = False
+
+def toggleAltRendering():
+    global ALT_REND
+    ALT_REND = not ALT_REND
 
 gravitySlider = GravitySlider(20, 20, SLIDER_LENGTH, SLIDER_HEIGHT, 1, 20, BodyFile.G)
 timeSlider = TimeSlider(20, 50, SLIDER_LENGTH, SLIDER_HEIGHT, 0.01, 3, DT)
 particlesSlider = ParticlesSlider(20, 80, SLIDER_LENGTH, SLIDER_HEIGHT, 1, 100, NUM_OF_PARTICLES)
+
+altButton = Button(300, 20, 50, 20, toggleAltRendering)
 
 def create_text_surface(text, font, color):
     text_surface = font.render(text, True, color)
@@ -69,6 +79,7 @@ def set_gravitational_constant(value):
 def main(render_mode: int):
     global DT
     global NUM_OF_PARTICLES
+    global ALT_REND
     print("interstellarIO")
 
     pg.init()
@@ -110,6 +121,7 @@ def main(render_mode: int):
             gravitySlider.handle_event(event)
             timeSlider.handle_event(event)
             particlesSlider.handle_event(event)
+            altButton.handle_event(event)
             if event.type == pg.MOUSEWHEEL:
                 sensitivity = 0.1
                 if camera.zoom + event.y * sensitivity > MIN_ZOOM: 
@@ -134,13 +146,14 @@ def main(render_mode: int):
         gravitySlider.draw(screen)
         timeSlider.draw(screen)
         particlesSlider.draw(screen)
+        altButton.draw(screen, WHITE, GREEN)
 
         for i in range(UPDATES_PER_FRAME):
             for j in bodies:
                  current = 0
             body_count = len(bodies)
             while current < body_count:
-                merges = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1, (bodies[current].uid == camera.obj.uid), spawner.newRadius(camera.obj))
+                merges = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1, (bodies[current].uid == camera.obj.uid), spawner.newRadius(camera.obj), ALT_REND)
                 for m in merges:
 
                     if m[0] == -1:
@@ -163,6 +176,7 @@ def main(render_mode: int):
         gValueText = create_text_surface(str(round(BodyFile.G, 2)), FONT1, WHITE)
         timeValueText = create_text_surface(str(round(DT, 2)), FONT1, WHITE)
         numParticlesText = create_text_surface(str(NUM_OF_PARTICLES), FONT1, WHITE)
+        altButtonText = create_text_surface(str(f"Alternate rendering: {ALT_REND}"), FONT1, WHITE)
 
         
 
@@ -180,6 +194,7 @@ def main(render_mode: int):
         screen.blit(gText, (60, 25))
         screen.blit(timeFactor, (90, 55))
         screen.blit(numParticles, (70, 90))
+        screen.blit(altButtonText, (370, 20))
 
         n_particles = len(bodies)
         for i in range(NUM_OF_PARTICLES - n_particles):
@@ -200,7 +215,6 @@ def main(render_mode: int):
         currentStateText = create_text_surface("You currently have the mass of: " + str(camera.obj.state), FONT1, WHITE)
         screen.blit(currentMassText, (25, 630))
         screen.blit(currentStateText, (25, 660))
-        print(camera.obj.state)
         pg.display.flip()
         clock.tick(60)
     

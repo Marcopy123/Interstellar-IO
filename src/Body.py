@@ -28,12 +28,15 @@ class Body:
         
         
     # Returns vector for gravitational pull of other Body acting on this Body
-    def gravitational_force_from_other(self, other):
+    def gravitational_force_from_other(self, other, alt_rendering: bool):
         d_pos = other.pos - self.pos
         distance_squared = sum(x**2 for x in d_pos)
-        if distance_squared < (self.radius + other.radius)**2 / 2:
+        if distance_squared < (self.radius + other.radius)**2:
             return np.array([0.0])
-        scalar_force = G * self.mass * other.mass / distance_squared
+        if alt_rendering:
+            scalar_force = G * self.mass * other.mass / math.sqrt(distance_squared)
+        else:
+            scalar_force = G * self.mass * other.mass / distance_squared
         d_pos_magnitude = np.linalg.norm(d_pos)
         unit_vec = d_pos / d_pos_magnitude
         return [scalar_force * unit_vec, d_pos_magnitude]
@@ -43,7 +46,7 @@ class Body:
     # If n is 0, no merges were done (no bodies)
     # Otherwise, the size of n is the number of merges that were made, i.e. the number of bodies deleted
     # Additionally, if n is negative, the self object has been merged AND deleted
-    def update(self, dt: float, bodies: [], start: int, check_despawn: bool, spawn_radius: float):
+    def update(self, dt: float, bodies: [], start: int, check_despawn: bool, spawn_radius: float, alt_rendering: bool):
             
         if self.id % (1 / self.trail_density) == 0:
             if len(self.trail) < self.max_trail:
@@ -64,7 +67,7 @@ class Body:
         while current < body_count:
             # TODO maybe reuse calculated second.pos - first.pos with gravitational_force
             other = bodies[current]
-            result = self.gravitational_force_from_other(other)
+            result = self.gravitational_force_from_other(other, alt_rendering)
             if check_despawn and len(result) > 1:
                 if result[1] > DESPAWN_RADIUS + spawn_radius:
                     merges.append([current, -2])
