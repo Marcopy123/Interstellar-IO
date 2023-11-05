@@ -12,6 +12,7 @@ class Body:
         self.vel = vel
         self.uid = uid
         self.radius = math.sqrt(mass / DENSITY)
+        self.target_radius = self.radius
         self.net_force = np.array([0.0, 0.0])
         
         self.trail = []
@@ -26,8 +27,9 @@ class Body:
         if distance_squared < (self.radius + other.radius)**2 / 2:
             return np.array([0.0])
         scalar_force = G * self.mass * other.mass / distance_squared
-        unit_vec = d_pos / np.linalg.norm(d_pos)
-        return scalar_force * unit_vec
+        d_pos_magnitude = np.linalg.norm(d_pos)
+        unit_vec = d_pos / d_pos_magnitude
+        return [scalar_force * unit_vec, d_pos_magnitude]
 
     # Calculates net force on body and updates kinematic quantities
     # Returns an integer n:
@@ -47,6 +49,10 @@ class Body:
         merges = []
         current = start
         body_count = len(bodies)
+
+        if self.target_radius > self.radius:
+            self.radius += 0.2
+
         while current < body_count:
             # TODO maybe reuse calculated second.pos - first.pos with gravitational_force
             other = bodies[current]
@@ -67,7 +73,7 @@ class Body:
                 # TODO instead of changing vel, change net_force?? maybe
                 big.vel = ((big.mass * big.vel) + (small.mass * small.vel)) / (big.mass + small.mass)
                 big.mass += small.mass
-                big.radius = math.sqrt(big.mass / DENSITY)
+                big.target_radius = int(5 * math.sqrt(big.mass / DENSITY)) / 5
                 bodies.remove(small)
 
                 merges.append([small.uid, big.uid])

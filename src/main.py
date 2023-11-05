@@ -17,18 +17,17 @@ WINDOW_WIDTH = 700
 WINDOW_HEIGHT = 700
 NUM_OF_PARTICLES = 25
 MIN_ZOOM = 0.1
-MAX_ZOOM = 10
+MAX_ZOOM = 20
 SLIDER_LENGTH = 200
 SLIDER_HEIGHT = 5
 
-# font = pg.font.Font('freesansbold.ttf', 32)
+
 pg.init()
 FONT1 = pg.font.Font(None, 30)
 FONT2 = pg.font.Font(None, 20)
 
-# Set up colors
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
+BLACK = (0,0,0)
+WHITE = (255,255,255)
 
 gravitySlider = GravitySlider(20, 20, SLIDER_LENGTH, SLIDER_HEIGHT, 1, 20, BodyFile.G)
 timeSlider = TimeSlider(20, 50, SLIDER_LENGTH, SLIDER_HEIGHT, 0.05, 3, DT)
@@ -112,14 +111,19 @@ def main():
                     direction = direction / np.linalg.norm(direction)
                 else:
                     direction = np.array([0.0, 0.0])
-                print(direction)
-                force = 5 * camera.obj.mass** 2 * DT
-                camera.obj.add_force(direction, force)
-        draw_grid(screen, grid_color, cell_size, camera.offset)     
-        gravitySlider.draw(screen)    
+                ejectedMass = camera.obj.mass / 250
+                relMassVelocity = 4 * math.sqrt(camera.obj.mass)
+                camera.obj.mass -= ejectedMass
+                dforce = camera.obj.mass * ejectedMass * relMassVelocity
+                dforce /= (DT * (1 - ejectedMass))
+
+                camera.obj.add_force(direction, dforce)
+            
+        draw_grid(screen, grid_color, cell_size, camera.offset)
+        gravitySlider.draw(screen)
         timeSlider.draw(screen)
         particlesSlider.draw(screen)
-        
+
         for i in range(UPDATES_PER_FRAME):
             for j in bodies:
                  current = 0
@@ -145,7 +149,6 @@ def main():
                 body_count -= len(merges)
                 current += 1
 
-        
         gValueText = create_text_surface(str(round(BodyFile.G, 2)), FONT1, BLACK)
         timeValueText = create_text_surface(str(round(DT, 2)), FONT1, BLACK)
         numParticlesText = create_text_surface(str(NUM_OF_PARTICLES), FONT1, BLACK)
