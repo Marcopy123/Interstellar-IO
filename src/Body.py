@@ -50,10 +50,11 @@ class Body:
             
         if self.id % (1 / self.trail_density) == 0:
             if len(self.trail) < self.max_trail:
-                self.trail.append(self.pos.copy())
+                self.trail.append([self.pos[0], self.pos[1], np.linalg.norm(self.vel)])
             else:
                 self.trail = self.trail[1:]
-                self.trail.append(self.pos.copy())
+                self.trail.append([self.pos[0], self.pos[1], np.linalg.norm(self.vel)])
+
                 
         self.id += 1
         
