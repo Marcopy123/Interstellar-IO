@@ -42,11 +42,12 @@ class Camera:
     def draw(self, objs):
         for i in objs:
             # Draw trail
+            trail_idx = 0
             for j in i.trail:
                 x_pos = (j[0] - self.offset[0] - self.screen.get_size()[0] / 2) * self.zoom + self.screen.get_size()[0] / 2
                 y_pos = (j[1] - self.offset[1] - self.screen.get_size()[1] / 2) * self.zoom + self.screen.get_size()[1] / 2
-                pg.draw.circle(self.screen, pg.Color(128,128,128, a=0.5), (x_pos, y_pos), i.radius/3 * self.zoom)
-                
+                pg.draw.circle(self.screen, pg.Color(128,128,128, a=0.5), (x_pos, y_pos), i.radius/3 * self.zoom * (trail_idx + 1)/self.obj.max_trail)
+                trail_idx += 1
             
             # Draw object
             x_pos = (i.pos[0] - self.offset[0] - self.screen.get_size()[0] / 2) * self.zoom + self.screen.get_size()[0] / 2
