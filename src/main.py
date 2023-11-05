@@ -22,7 +22,6 @@ MAX_ZOOM = 20
 SLIDER_LENGTH = 200
 SLIDER_HEIGHT = 5
 
-
 pg.init()
 FONT1 = pg.font.Font(None, 30)
 FONT2 = pg.font.Font(None, 20)
@@ -170,13 +169,10 @@ def main(render_mode: int):
         timeFactor = create_text_surface("Time Factor", FONT2, WHITE)
         numParticles = create_text_surface("Number of particles", FONT2, WHITE)
 
-
-
         screen.blit(gValueText, (230, 15))
         screen.blit(timeValueText, (230, 45))
         screen.blit(numParticlesText, (230, 75))
         
-
         screen.blit(gText, (60, 25))
         screen.blit(timeFactor, (90, 55))
         screen.blit(numParticles, (70, 90))
@@ -195,7 +191,7 @@ def main(render_mode: int):
     
         numOfSolarMasses = camera.obj.mass / (195000)
 
-        currentMassText = create_text_surface("Current mass: " + str(round(numOfSolarMasses, 6)) + "sol", FONT1, WHITE)
+        currentMassText = create_text_surface("Current mass: ~" + str(round(numOfSolarMasses, 6)) + "sol", FONT1, WHITE)
         
         currentStateText = create_text_surface("You currently have the mass of: " + str(camera.obj.state), FONT1, WHITE)
         screen.blit(currentMassText, (25, 630))
