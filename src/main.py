@@ -12,6 +12,7 @@ from TimeSlider import TimeSlider
 from ParticlesSlider import ParticlesSlider
 from SpaceTimeButton import SpaceTimeButton
 from AltButton import AltButton
+import time
 
 DT = 0.3 # Delta time for the physics engine
 UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each frame
@@ -114,6 +115,26 @@ window_size = (WINDOW_WIDTH, WINDOW_HEIGHT)
 screen = pg.display.set_mode(window_size)
 # In your main game loop, before drawing anything else:
 
+def draw_fading_circle(surface, pos, max_radius, duration):
+    center = (pos // 2, pos // 2)
+    start_time = time.time()
+    clock = pg.time.Clock()
+    while time.time() - start_time < duration:
+        elapsed_time = time.time() - start_time
+        alpha = max(0, 255 - (255 * (elapsed_time / duration)))
+        radius = int(max_radius * (elapsed_time / duration))
+
+        # Create a new surface with per-pixel alpha to draw the circle with alpha transparency
+        circle_surface = pg.Surface((max_radius * 2, max_radius * 2), pg.SRCALPHA)
+        pg.draw.circle(circle_surface, (255, 255, 255, int(alpha)), (max_radius, max_radius), radius)
+
+        surface.fill(BLACK)
+        surface.blit(circle_surface, (center[0] - max_radius, center[1] - max_radius))
+        pg.display.flip()
+
+        # Control the frame rate
+        clock.tick(60)
+
 def set_gravitational_constant(value):
     global G
     BodyFile.G = value
@@ -185,7 +206,7 @@ def main(render_mode: int):
             if event.type == pg.MOUSEWHEEL:
                 sensitivity = 0.1
                 if camera.zoom + event.y * sensitivity > MIN_ZOOM or event.y > 0:
-                    camera.zoom += event.y * camera.zoomf * sensitivity
+                    camera.zoom += event.y * camera.zoom * sensitivity
                 else:
                     camera.zoom -= camera.zoom * sensitivity
             elif event.type == pg.KEYDOWN and render_mode == 1:
