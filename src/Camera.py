@@ -14,7 +14,7 @@ class Camera:
         self.obj = follow_obj
         self.screen = screen
         self.init_pos = follow_obj.pos.copy() + np.array([self.screen.get_size()[0]/2 - self.obj.pos[0], self.screen.get_size()[1]/2 - self.obj.pos[1]])
-        self.zoom = 4.000000000001
+        self.zoom = 4.000000000002
         self.offset = np.array([0.0, 0.0])
         self.sensitivity = 0.1
         self.fade_circle = False
