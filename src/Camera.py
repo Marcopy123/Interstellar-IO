@@ -31,9 +31,6 @@ class Camera:
         Update camera parameters according to the player input
         """
         self.offset = self.obj.pos - self.init_pos
-        # self.zoom += (0.01 if self.zoom < target_zoom else 0.0)
-        # if self.zoom < target_zoom:
-        #     print("a")
 
 
     def zoom_dist(self, objs):
@@ -75,40 +72,29 @@ class Camera:
                     color[1] = max(color[1], 0)
         return pg.Color(color[0], color[1], color[2], a=0.3)
 
-
-    def draw(self, objs, camera, fade_circle_surface):
-        for i in objs:
-            # Draw trail
-            if i.uid == camera.uid:
-                continue
-            trail_idx = 0
-            for j in i.trail:
-                x_pos = (j[0] - self.offset[0] - self.screen.get_size()[0] / 2) * self.zoom + self.screen.get_size()[0] / 2
-                y_pos = (j[1] - self.offset[1] - self.screen.get_size()[1] / 2) * self.zoom + self.screen.get_size()[1] / 2
-                #pg.draw.circle(self.screen, pg.Color(128, 128, 128, a=0.5), (x_pos, y_pos), i.radius / 3 * self.zoom * (trail_idx + 1) / self.obj.max_trail)
-                pg.draw.circle(self.screen, self.color_from_speed(j[2] * 100), (x_pos, y_pos), i.radius * i.trail_thick * self.zoom * (trail_idx + 1)/self.obj.max_trail)
-                trail_idx += 1
-            
-            # Draw object
-            x_pos = (i.pos[0] - self.offset[0] - self.screen.get_size()[0] / 2) * self.zoom + self.screen.get_size()[0] / 2
-            y_pos = (i.pos[1] - self.offset[1] - self.screen.get_size()[1] / 2) * self.zoom + self.screen.get_size()[1] / 2
-            img = pg.transform.scale(i.image, (i.radius * self.zoom * 3, i.radius * self.zoom * 3))
-            self.screen.blit(img, (x_pos - i.radius * self.zoom * 3/2 , y_pos - i.radius * self.zoom * 3/2))
-
-        # Do camera
+    def draw_object(self, obj):
         trail_idx = 0
-        for j in camera.trail:
+        for j in obj.trail:
             x_pos = (j[0] - self.offset[0] - self.screen.get_size()[0] / 2) * self.zoom + self.screen.get_size()[0] / 2
             y_pos = (j[1] - self.offset[1] - self.screen.get_size()[1] / 2) * self.zoom + self.screen.get_size()[1] / 2
-            #pg.draw.circle(self.screen, pg.Color(128, 128, 128, a=0.5), (x_pos, y_pos), camera.radius / 3 * self.zoom * (trail_idx + 1) / self.obj.max_trail)
-            pg.draw.circle(self.screen, self.color_from_speed(j[2] * 100), (x_pos, y_pos), i.radius * i.trail_thick * self.zoom * (trail_idx + 1)/self.obj.max_trail)
+            pg.draw.circle(self.screen, self.color_from_speed(j[2] * 100), (x_pos, y_pos), obj.radius * obj.trail_thick * self.zoom * (trail_idx + 1) / self.obj.max_trail)
             trail_idx += 1
         
         # Draw object
-        x_pos = (camera.pos[0] - self.offset[0] - self.screen.get_size()[0] / 2) * self.zoom + self.screen.get_size()[0] / 2
-        y_pos = (camera.pos[1] - self.offset[1] - self.screen.get_size()[1] / 2) * self.zoom + self.screen.get_size()[1] / 2
-        img = pg.transform.scale(camera.image, (camera.radius * self.zoom * 3, camera.radius * self.zoom * 3))
-        self.screen.blit(img, (x_pos - camera.radius * self.zoom * 3/2 , y_pos - camera.radius * self.zoom * 3/2))
+        x_pos = (obj.pos[0] - self.offset[0] - self.screen.get_size()[0] / 2) * self.zoom + self.screen.get_size()[0] / 2
+        y_pos = (obj.pos[1] - self.offset[1] - self.screen.get_size()[1] / 2) * self.zoom + self.screen.get_size()[1] / 2
+        img = pg.transform.scale(obj.image, (obj.radius * self.zoom * 3, obj.radius * self.zoom * 3))
+        self.screen.blit(img, (x_pos - obj.radius * self.zoom * 3/2 , y_pos - obj.radius * self.zoom * 3/2))
+
+    def draw(self, objs, fade_circle_surface):
+        for i in objs:
+            # Draw trail
+            if i.uid == self.obj.uid:
+                continue
+            self.draw_object(i)
+
+        # Do camera
+        self.draw_object(self.obj)
 
         if self.fade_circle:
             self.circle_duration = 100

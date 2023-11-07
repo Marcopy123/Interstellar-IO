@@ -1,15 +1,16 @@
 import math 
 import numpy as np
 import pygame as pg
-from sys import argv
-from Body import Body
 import random
+from sys import argv
+from time import time
+
+from Body import Body
 from Camera import Camera
 from Spawner import Spawner
 from Slider import Slider
 from Button import Button
 import Body as BodyFile
-import time
 
 DT = 0.3 # Delta time for the physics engine
 UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each frame
@@ -17,8 +18,7 @@ UPDATES_PER_FRAME = 1 # Number of iterations of the physics engine for each fram
 WINDOW_WIDTH = 700
 WINDOW_HEIGHT = 700
 NUM_OF_PARTICLES = 50
-MIN_ZOOM = 0.000000000001
-MAX_ZOOM = 20
+MAX_ZOOM = 50
 SLIDER_LENGTH = 200
 SLIDER_HEIGHT = 5
 
@@ -26,8 +26,8 @@ SLIDER_HEIGHT = 5
 FONT1 = None
 FONT2 = None
 
-BLACK = (0,0,0)
-WHITE = (255,255,255)
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
 GREEN = (60, 250, 60)
 
 ALT_REND = False
@@ -173,10 +173,11 @@ def main(render_mode: int):
 
     
     running = True
-    start_time = time.time()
-    # pygame main loop
+    start_time = time()
+
+    # Main loop
     while running:
-        if time.time() > start_time + 3600 * 24 * 365 * 1000000000:
+        if time() > start_time + 3600 * 24 * 365 * 1000000000:
             print("Hawking radiation. You die.")
             exit(0)
 
@@ -195,10 +196,10 @@ def main(render_mode: int):
 
             if event.type == pg.MOUSEWHEEL:
                 sensitivity = 0.1
-                if camera.zoom + event.y * sensitivity > MIN_ZOOM or event.y > 0:
+                new_zoom = camera.zoom + event.y * sensitivity
+                if new_zoom < MAX_ZOOM:
                     camera.zoom += event.y * camera.zoom * sensitivity
-                else:
-                    camera.zoom -= camera.zoom * sensitivity
+
             elif event.type == pg.KEYDOWN and render_mode == 1:
                 if pg.key.get_pressed()[pg.K_RETURN]:
                     # Switch camera to next body
@@ -269,7 +270,7 @@ def main(render_mode: int):
             NUM_OF_PARTICLES = int(particlesSlider.get_value())
         
         camera.update(targetZoom)
-        camera.draw(bodies, camera.obj, fade_circle_surface)
+        camera.draw(bodies, fade_circle_surface)
     
         numOfSolarMasses = camera.obj.mass / (195000)
 
