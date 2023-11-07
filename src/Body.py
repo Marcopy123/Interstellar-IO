@@ -48,7 +48,6 @@ class Body:
     # Otherwise, the size of n is the number of merges that were made, i.e. the number of bodies deleted
     # Additionally, if n is negative, the self object has been merged AND deleted
     def update(self, dt: float, bodies: [], start: int, check_despawn: bool, spawn_radius: float, alt_rendering: bool, camera):
-            
         if self.id % (1 / self.trail_density) == 0:
             if len(self.trail) < self.max_trail:
                 self.trail.append([self.pos[0], self.pos[1], np.linalg.norm(self.vel)])

@@ -6,12 +6,9 @@ from Body import Body
 import random
 from Camera import Camera
 from Spawner import Spawner
-from GravitySlider import GravitySlider
+from Slider import Slider
+from Button import Button
 import Body as BodyFile
-from TimeSlider import TimeSlider
-from ParticlesSlider import ParticlesSlider
-from SpaceTimeButton import SpaceTimeButton
-from AltButton import AltButton
 import time
 
 DT = 0.3 # Delta time for the physics engine
@@ -25,9 +22,9 @@ MAX_ZOOM = 20
 SLIDER_LENGTH = 200
 SLIDER_HEIGHT = 5
 
-pg.init()
-FONT1 = pg.font.Font(None, 30)
-FONT2 = pg.font.Font(None, 20)
+# To set once pygame is initialized
+FONT1 = None
+FONT2 = None
 
 BLACK = (0,0,0)
 WHITE = (255,255,255)
@@ -38,10 +35,13 @@ CURVE_SPACETIME = False
 SPAWN_SEED = -1
 
 
+def toggleAltRend():
+    global ALT_REND
+    ALT_REND = not ALT_REND
 
-gravitySlider = GravitySlider(20, 20, SLIDER_LENGTH, SLIDER_HEIGHT, 0.1, 20, BodyFile.G)
-timeSlider = TimeSlider(20, 50, SLIDER_LENGTH, SLIDER_HEIGHT, 0.000001, 3, 0.3)
-particlesSlider = ParticlesSlider(20, 80, SLIDER_LENGTH, SLIDER_HEIGHT, 1, 100, NUM_OF_PARTICLES)
+def toggleSpacetime():
+    global CURVE_SPACETIME
+    CURVE_SPACETIME = not CURVE_SPACETIME
 
 def create_text_surface(text, font, color):
     text_surface = font.render(text, True, color)
@@ -72,9 +72,9 @@ def do_calculation(width, height, grid_count, gravity_points, curve_spacetime: b
                     continue
                 if d > 0:
                     a = np.arctan2(dy, dx)
-                    f = gravity_force / d * math.sqrt(body.mass / 1000)
+                    f = gravity_force / d * math.sqrt(body.mass / 5000)
                     f = f if f < d else d
-                    f = min(f, 8)
+                    f = min(f, 12)
                     x += np.cos(a) * f
                     y += np.sin(a) * f
 
@@ -107,14 +107,6 @@ def draw_grid(surface, grid_color, cell_size, offset, gravity_points, curve_spac
             end_pos = warped_grid[xi + 1, yi] - np.array(offset)
             pg.draw.line(surface, grid_color, start_pos, end_pos)
 
-# Usage example within your game loop:
-# Define your grid color and cell size
-grid_color = (150, 150, 150)  # Light grey color for the grid lines
-cell_size = 40  # Adjust the cell size as per your requirement
-window_size = (WINDOW_WIDTH, WINDOW_HEIGHT)
-screen = pg.display.set_mode(window_size)
-# In your main game loop, before drawing anything else:
-
 
 def set_gravitational_constant(value):
     global G
@@ -126,15 +118,29 @@ def main(render_mode: int):
     global ALT_REND
     global SPAWN_SEED
     global CURVE_SPACETIME
+    global FONT1
+    global FONT2
     print("interstellarIO")
 
     pg.init()
+
+    FONT1 = pg.font.Font(None, 30)
+    FONT2 = pg.font.Font(None, 20)
     
-    AltRenderingButton = AltButton(585, 20, 40, 20)
-    SpaceTimeButtonRender = SpaceTimeButton(585, 50, 40, 20)
+    gravitySlider = Slider(20, 20, SLIDER_LENGTH, SLIDER_HEIGHT, 0.1, 20, BodyFile.G)
+    timeSlider = Slider(20, 50, SLIDER_LENGTH, SLIDER_HEIGHT, 0.000001, 3, 0.3)
+    particlesSlider = Slider(20, 80, SLIDER_LENGTH, SLIDER_HEIGHT, 1, 100, NUM_OF_PARTICLES)
+
+    altButton = Button(585, 20, 40, 20, toggleAltRend)
+    spacetimeButton = Button(585, 50, 40, 20, toggleSpacetime)
+
     pg.display.set_caption("Interstellar IO")
 
-    screen = pg.display.set_mode(window_size)
+    screen = pg.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+
+    # Grid parameters
+    grid_color = (150, 150, 150) # Light grey
+    cell_size = 40
 
     bodies = []
 
@@ -167,8 +173,13 @@ def main(render_mode: int):
 
     
     running = True
+    start_time = time.time()
     # pygame main loop
     while running:
+        if time.time() > start_time + 3600 * 24 * 365 * 1000000000:
+            print("Hawking radiation. You die.")
+            exit(0)
+
         screen.fill((0,0,42))
         for event in pg.event.get():
             pos = pg.mouse.get_pos()
@@ -177,14 +188,10 @@ def main(render_mode: int):
             gravitySlider.handle_event(event)
             timeSlider.handle_event(event)
             particlesSlider.handle_event(event)
-            # altButton.handle_event(event)
-            # spacetimeButton.handle_event(event)
+            altButton.handle_event(event)
+            spacetimeButton.handle_event(event)
 
-            if event.type == pg.MOUSEBUTTONDOWN:
-                AltRenderingButton.toggle(pos)
-                SpaceTimeButtonRender.toggle(pos)
-                ALT_REND = AltRenderingButton.on
-                CURVE_SPACETIME = SpaceTimeButtonRender.on
+
 
             if event.type == pg.MOUSEWHEEL:
                 sensitivity = 0.1
@@ -282,13 +289,12 @@ def main(render_mode: int):
         screen.blit(numParticles, (70, 90))
         screen.blit(altButtonText, (370, 20))
         screen.blit(spacetimeText, (370, 50))
+
         gravitySlider.draw(screen)
         timeSlider.draw(screen)
         particlesSlider.draw(screen)
-        # altButton.draw(screen, WHITE, GREEN)
-        # spacetimeButton.draw(screen, WHITE, GREEN)
-        SpaceTimeButtonRender.draw(screen)
-        AltRenderingButton.draw(screen)
+        altButton.draw(screen, ALT_REND)
+        spacetimeButton.draw(screen, CURVE_SPACETIME)
         pg.display.flip()
         clock.tick(60)
     
