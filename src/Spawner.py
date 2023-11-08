@@ -6,8 +6,8 @@ import pygame as pg
 import time
 
 class Spawner:
-    def __init__(self, player: Body, spawn_seed: int) -> None:
-        self.size = self.newRadius(player) # make the size of the spawner dependent on the mass
+    def __init__(self, player: Body, spawn_seed = -1):
+        self.size = self.new_radius(player) # Make the size of the spawner dependent on the mass
         self.currentParticles = 0
         if spawn_seed < 0:
             seed = int(time.time())
@@ -16,39 +16,39 @@ class Spawner:
         else:
             random.seed(spawn_seed)
     
-    def newRadius(self, player: Body):
+    def new_radius(self, player: Body):
         return player.radius * 20 + 100
 
-    def spawnParticle(self, player: Body, uid: int, anywhere: bool) -> Body:
+    def spawn_particle(self, player: Body, uid: int, anywhere: bool) -> Body:
         # spawn a particle within the size, random mass, random x y pos within radius, initial velocity of 0
         # make sure the particle is smaller than the player body mass
 
-        addToSpawnRadius = 0.0
+        add_to_spawn_radius = 0.0
 
-        massAlgorithm = random.random()
-        if massAlgorithm < 0.005:
-            massOfParticle = random.randint(int(player.mass), int(player.mass * 8))
-            addToSpawnRadius += player.radius * 30
-        elif massAlgorithm < 0.1:
-            massOfParticle = random.randint(int(player.mass/20), int(player.mass/10))
-        elif massAlgorithm < 0.15:
-            massOfParticle = random.randint(int(player.mass/30), int(player.mass/15))
+        mass_algorithm = random.random()
+        if mass_algorithm < 0.005:
+            mass_of_particle = random.randint(int(player.mass), int(player.mass * 8))
+            add_to_spawn_radius += player.radius * 30
+        elif mass_algorithm < 0.1:
+            mass_of_particle = random.randint(int(player.mass/20), int(player.mass/10))
+        elif mass_algorithm < 0.15:
+            mass_of_particle = random.randint(int(player.mass/30), int(player.mass/15))
         else:
-            massOfParticle = random.randint(int(1/2 * math.sqrt(player.mass)), int(6 * math.sqrt(player.mass)))
+            mass_of_particle = random.randint(int(1/2 * math.sqrt(player.mass)), int(6 * math.sqrt(player.mass)))
 
-        minX = int(player.pos[0] - self.size)
-        maxX = int(player.pos[0] + self.size)
-        randX = random.randint(minX + 1, maxX - 1)
+        min_x = int(player.pos[0] - self.size)
+        max_x = int(player.pos[0] + self.size)
+        rand_x = random.randint(min_x + 1, max_x - 1)
 
-        yPos = math.sqrt(self.size**2 - (player.pos[0] - randX)**2)
+        y_pos = math.sqrt(self.size**2 - (player.pos[0] - rand_x)**2)
         
         if anywhere:
-            randY = random.randint(int(player.pos[1] - self.size) + 1, int(player.pos[1] + self.size) - 1)
+            rand_y = random.randint(int(player.pos[1] - self.size) + 1, int(player.pos[1] + self.size) - 1)
         else:
-            randY = player.pos[1] + random.choice([yPos, -yPos])
+            rand_y = player.pos[1] + random.choice([y_pos, -y_pos])
         
 
         # Update size
-        self.size = self.newRadius(player)
+        self.size = self.new_radius(player)
 
-        return Body.Body(massOfParticle, np.array([float(randX + random.random() * 50), float(randY + random.random() * 50)]), np.array([random.uniform(-5, 5), random.uniform(-5, 5)]), uid)
+        return Body.Body(mass_of_particle, np.array([float(rand_x + random.random() * 50), float(rand_y + random.random() * 50)]), np.array([random.uniform(-5, 5), random.uniform(-5, 5)]), uid)

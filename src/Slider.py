@@ -13,7 +13,8 @@ class Slider:
         self.handle_rect = pg.Rect(x + (start_val - min_val) / (max_val - min_val) * w, y - HANDLE_RADIUS, HANDLE_RADIUS * 2, HANDLE_RADIUS * 2)
         self.active = False
 
-    def handle_event(self, event):
+
+    def handle_event(self, event: pg.event.Event) -> None:
         if event.type == pg.MOUSEBUTTONDOWN:
             if self.handle_rect.collidepoint(event.pos):
                 self.active = True
@@ -28,7 +29,7 @@ class Slider:
                 self.handle_rect.centerx = new_x
                 self.val = self.min_val + (self.max_val - self.min_val) * ((new_x - self.rect.left) / self.rect.width)
 
-    def draw(self, surface):
+    def draw(self, surface: pg.Surface) -> None:
         pg.draw.rect(surface, COLOR_INACTIVE if not self.active else COLOR_ACTIVE, self.rect)
         pg.draw.circle(surface, COLOR_INACTIVE if not self.active else COLOR_ACTIVE, self.handle_rect.center, HANDLE_RADIUS)
 

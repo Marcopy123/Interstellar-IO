@@ -35,19 +35,22 @@ CURVE_SPACETIME = False
 SPAWN_SEED = -1
 
 
-def toggleAltRend():
+def toggle_alt_render():
     global ALT_REND
     ALT_REND = not ALT_REND
 
-def toggleSpacetime():
+
+def toggle_spacetime():
     global CURVE_SPACETIME
     CURVE_SPACETIME = not CURVE_SPACETIME
 
-def create_text_surface(text, font, color):
+
+def create_text_surface(text: str, font: pg.font.Font, color: pg.Color):
     text_surface = font.render(text, True, color)
     return text_surface
 
-def do_calculation(width, height, grid_count, gravity_points, curve_spacetime: bool, curve_all: bool, gravity_force=2000):
+
+def do_calculation(width, height, grid_count, gravity_points: [(float, float)], curve_spacetime, curve_all, gravity_force = 2000) -> np.ndarray:
     grid = []
 
     for yi in range(grid_count):
@@ -82,7 +85,8 @@ def do_calculation(width, height, grid_count, gravity_points, curve_spacetime: b
         grid.append(row)
     return np.array(grid)
 
-def draw_grid(surface, grid_color, cell_size, offset, gravity_points, curve_spacetime: bool, curve_all: bool):
+
+def draw_grid(surface: pg.Surface, grid_color: (int, int, int), cell_size, offset: np.ndarray[np.float64], gravity_points: [(float, float)], curve_spacetime, curve_all):
     """
     Draws a warped grid on the given surface with respect to gravity points.
     Args:
@@ -109,10 +113,10 @@ def draw_grid(surface, grid_color, cell_size, offset, gravity_points, curve_spac
 
 
 def set_gravitational_constant(value):
-    global G
-    BodyFile.G = value
+    BodyFile.BIG_G = value
 
-def main(render_mode: int):
+
+def main(render_mode):
     global DT
     global NUM_OF_PARTICLES
     global ALT_REND
@@ -120,21 +124,21 @@ def main(render_mode: int):
     global CURVE_SPACETIME
     global FONT1
     global FONT2
-    print("interstellarIO")
+    print("singularIO")
 
     pg.init()
 
     FONT1 = pg.font.Font(None, 30)
     FONT2 = pg.font.Font(None, 20)
     
-    gravitySlider = Slider(20, 20, SLIDER_LENGTH, SLIDER_HEIGHT, 0.1, 20, BodyFile.G)
+    gravitySlider = Slider(20, 20, SLIDER_LENGTH, SLIDER_HEIGHT, 0.1, 20, BodyFile.BIG_G)
     timeSlider = Slider(20, 50, SLIDER_LENGTH, SLIDER_HEIGHT, 0.000001, 3, 0.3)
     particlesSlider = Slider(20, 80, SLIDER_LENGTH, SLIDER_HEIGHT, 1, 100, NUM_OF_PARTICLES)
 
-    altButton = Button(585, 20, 40, 20, toggleAltRend)
-    spacetimeButton = Button(585, 50, 40, 20, toggleSpacetime)
+    altButton = Button(585, 20, 40, 20, toggle_alt_render)
+    spacetimeButton = Button(585, 50, 40, 20, toggle_spacetime)
 
-    pg.display.set_caption("Interstellar IO")
+    pg.display.set_caption("Singulario")
 
     screen = pg.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
@@ -160,7 +164,6 @@ def main(render_mode: int):
     
     clock = pg.time.Clock()
     camera = Camera(bodies[0], screen)
-    targetZoom = camera.calculate_zoom_based_on_mass()
     spawner = Spawner(bodies[0], SPAWN_SEED)
 
     fade_circle_surface = pg.Surface((screen.get_size()), pg.SRCALPHA)
@@ -168,7 +171,7 @@ def main(render_mode: int):
     if render_mode == 0:
         # First round of spawning is anywhere around the player, not at the edge of the spawn circle
         for i in range(NUM_OF_PARTICLES - 1):
-            bodies.append(spawner.spawnParticle(bodies[0], next_player_uid, True))
+            bodies.append(spawner.spawn_particle(bodies[0], next_player_uid, True))
             next_player_uid += 1
 
     
@@ -224,33 +227,25 @@ def main(render_mode: int):
                 camera.obj.add_force(direction, dforce)
             
         draw_grid(screen, grid_color, cell_size, camera.offset, bodies, CURVE_SPACETIME, (render_mode == 1))
-        
 
         for i in range(UPDATES_PER_FRAME):
             for j in bodies:
-                 current = 0
+                current = 0
             body_count = len(bodies)
             while current < body_count:
-                merges = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1, (bodies[current].uid == camera.obj.uid), spawner.newRadius(camera.obj), ALT_REND, camera)
+                merges = bodies[current].update(DT / UPDATES_PER_FRAME, bodies, current + 1, (bodies[current].uid == camera.obj.uid), spawner.new_radius(camera.obj), ALT_REND, camera)
                 for m in merges:
-
-                    if m[0] == -1:
-                        # Self was deleted
-                        current -= 1
                     if m[0] == camera.obj.uid:
                         # Camera needs change
-                        
                         for b in bodies:
                             if b.uid == m[1]:
                                 camera.obj = b
-                                ntargetZoom = camera.calculate_zoom_based_on_mass()
-                                #if ntargetZoom != targetZoom:
-                                    #print("a")
                                 break
+                    # TODO update current if a merge deleted an object with index < current
                 body_count -= len(merges)
                 current += 1
 
-        gValueText = create_text_surface(str(round(BodyFile.G, 2)), FONT1, WHITE)
+        gValueText = create_text_surface(str(round(BodyFile.BIG_G, 2)), FONT1, WHITE)
         timeValueText = create_text_surface(str(round(DT, 2)), FONT1, WHITE)
         numParticlesText = create_text_surface(str(NUM_OF_PARTICLES), FONT1, WHITE)
         altButtonText = create_text_surface(f"Alternate simulation", FONT1, WHITE)
@@ -262,14 +257,14 @@ def main(render_mode: int):
 
         n_particles = len(bodies)
         for i in range(NUM_OF_PARTICLES - n_particles):
-            bodies.append(spawner.spawnParticle(camera.obj, next_player_uid, False))
+            bodies.append(spawner.spawn_particle(camera.obj, next_player_uid, False))
             next_player_uid += 1
         set_gravitational_constant(gravitySlider.get_value())
         DT = timeSlider.get_value()
         if render_mode != 1:
             NUM_OF_PARTICLES = int(particlesSlider.get_value())
         
-        camera.update(targetZoom)
+        camera.update()
         camera.draw(bodies, fade_circle_surface)
     
         numOfSolarMasses = camera.obj.mass / (195000)
