@@ -4,7 +4,7 @@ import random
 import pygame as pg
 
 BIG_G = 1.0 # Gravitational constant
-DENSITY = 15 # Units of mass per unit of area
+DENSITY = 20 # Units of mass per unit of area
 DESPAWN_RADIUS = 350
 MAX_TRAIL = 15
 TRAIL_DENSITY = 2.0
@@ -70,7 +70,7 @@ class Body:
             other = bodies[current]
             result = self.gravitational_force_from_other(other, alt_rendering)
             if check_despawn and len(result) > 1:
-                if result[1] > DESPAWN_RADIUS + spawn_radius:
+                if result[1] > DESPAWN_RADIUS + spawn_radius * 1.5:
                     merges.append([current, -1])
                     bodies.pop(current)
                     body_count -= 1

@@ -10,6 +10,7 @@ from Camera import Camera
 from Spawner import Spawner
 from Slider import Slider
 from Button import Button
+from Grid import draw_grid
 import Body as BodyFile
 
 DT = 0.3 # Delta time for the physics engine
@@ -50,68 +51,6 @@ def create_text_surface(text: str, font: pg.font.Font, color: pg.Color):
     return text_surface
 
 
-def do_calculation(width, height, grid_count, gravity_points: [(float, float)], curve_spacetime, curve_all, gravity_force = 2000) -> np.ndarray:
-    grid = []
-
-    for yi in range(grid_count):
-        row = []
-        for xi in range(grid_count):
-            x = (width / grid_count) * xi
-            y = (height / grid_count) * yi
-
-            if not curve_spacetime:
-                row.append([x, y])
-                continue
-
-            for body in gravity_points:
-                if body.mass < 1000 and not curve_all:
-                    continue
-                px = body.pos[0]
-                py = body.pos[1]
-                dx = px - x
-                dy = py - y
-                d = dx**2 + dy**2
-                if d < body.radius:
-                    continue
-                if d > 0:
-                    a = np.arctan2(dy, dx)
-                    f = gravity_force / d * math.sqrt(body.mass / 5000)
-                    f = f if f < d else d
-                    f = min(f, 12)
-                    x += np.cos(a) * f
-                    y += np.sin(a) * f
-
-            row.append([x, y])
-        grid.append(row)
-    return np.array(grid)
-
-
-def draw_grid(surface: pg.Surface, grid_color: (int, int, int), cell_size, offset: np.ndarray[np.float64], gravity_points: [(float, float)], curve_spacetime, curve_all):
-    """
-    Draws a warped grid on the given surface with respect to gravity points.
-    Args:
-    - surface: The Pygame surface to draw on.
-    - grid_color: The color of the grid lines.
-    - cell_size: The size of each cell in the grid.
-    - gravity_points: A list of tuples representing the positions of gravity points.
-    """
-    width, height = 3000,3000
-    grid_count = max(width, height) // cell_size  # Number of cells in the largest dimension
-
-    warped_grid = do_calculation(width, height, grid_count, gravity_points, curve_spacetime, curve_all)
-
-    # Draw the warped grid lines
-    for yi in range(grid_count):
-        for xi in range(grid_count - 1):
-            start_pos = warped_grid[yi, xi] - np.array(offset)
-            end_pos = warped_grid[yi, xi + 1] - np.array(offset)
-            pg.draw.line(surface, grid_color, start_pos, end_pos)
-
-            start_pos = warped_grid[xi, yi] - np.array(offset)
-            end_pos = warped_grid[xi + 1, yi] - np.array(offset)
-            pg.draw.line(surface, grid_color, start_pos, end_pos)
-
-
 def set_gravitational_constant(value):
     BodyFile.BIG_G = value
 
@@ -145,6 +84,7 @@ def main(render_mode):
     # Grid parameters
     grid_color = (150, 150, 150) # Light grey
     cell_size = 40
+    cell_count = 100
 
     bodies = []
 
@@ -225,8 +165,14 @@ def main(render_mode):
                 dforce /= (DT * (1 - ejectedMass))
 
                 camera.obj.add_force(direction, dforce)
-            
-        draw_grid(screen, grid_color, cell_size, camera.offset, bodies, CURVE_SPACETIME, (render_mode == 1))
+        
+        # grid_scaling is the closest power of 4 to camera.zoom (so the grid is divided/multiplied by 4 according to the camera zoom)
+        log4n = math.floor(math.log(camera.zoom, 4))
+        grid_scaling = 4 ** log4n
+        if camera.zoom > grid_scaling * 2:
+            grid_scaling *= 4
+
+        draw_grid(screen, grid_color, int(cell_size / grid_scaling), cell_count, camera.offset, bodies, CURVE_SPACETIME, (render_mode == 1), camera)
 
         for i in range(UPDATES_PER_FRAME):
             for j in bodies:
@@ -241,7 +187,6 @@ def main(render_mode):
                             if b.uid == m[1]:
                                 camera.obj = b
                                 break
-                    # TODO update current if a merge deleted an object with index < current
                 body_count -= len(merges)
                 current += 1
 
