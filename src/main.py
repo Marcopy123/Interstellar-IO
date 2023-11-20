@@ -55,7 +55,7 @@ def set_gravitational_constant(value):
     BodyFile.BIG_G = value
 
 
-def main(render_mode):
+def main(render_mode=0):
     global DT
     global NUM_OF_PARTICLES
     global ALT_REND
@@ -84,7 +84,6 @@ def main(render_mode):
     # Grid parameters
     grid_color = (150, 150, 150) # Light grey
     cell_size = 40
-    cell_count = 100
 
     bodies = []
 
@@ -142,6 +141,7 @@ def main(render_mode):
                 new_zoom = camera.zoom + event.y * sensitivity
                 if new_zoom < MAX_ZOOM:
                     camera.zoom += event.y * camera.zoom * sensitivity
+                    print(camera.zoom)
 
             elif event.type == pg.KEYDOWN and render_mode == 1:
                 if pg.key.get_pressed()[pg.K_RETURN]:
@@ -166,13 +166,13 @@ def main(render_mode):
 
                 camera.obj.add_force(direction, dforce)
         
-        # grid_scaling is the closest power of 4 to camera.zoom (so the grid is divided/multiplied by 4 according to the camera zoom)
-        log4n = math.floor(math.log(camera.zoom, 4))
-        grid_scaling = 4 ** log4n
+        # grid_scaling is the closest power of 3 to camera.zoom (so the grid is divided/multiplied by 3 according to the camera zoom)
+        log3n = math.floor(math.log(camera.zoom, 3))
+        grid_scaling = 3 ** log3n
         if camera.zoom > grid_scaling * 2:
-            grid_scaling *= 4
+            grid_scaling *= 3
 
-        draw_grid(screen, grid_color, int(cell_size / grid_scaling), cell_count, camera.offset, bodies, CURVE_SPACETIME, (render_mode == 1), camera)
+        draw_grid(screen, grid_color, int(cell_size / grid_scaling), camera.offset, bodies, CURVE_SPACETIME, (render_mode == 1), camera)
 
         for i in range(UPDATES_PER_FRAME):
             for j in bodies:
